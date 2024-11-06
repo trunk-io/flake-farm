@@ -1,0 +1,48 @@
+{
+  "name": "Trunk Flake Farm",
+  "version": "1.0.0",
+  "description": "Code goes in...flaky tests come out",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "jasmine-test": "jasmine 'javascript/tests/jasmine/**/*.js'",
+    "jest-test": "jest javascript/tests/jest/**/*.js --config=javascript/tests/jest/jest.config.json",
+    "playwright-test": "npx playwright test",
+    "mocha-test": "mocha 'javascript/tests/mocha/**/*.*js' --reporter mocha-junit-reporter --reporter-options mochaFile=javascript/tests/mocha/mocha_test.xml",
+    "cucumber-test": "./javascript/tests/cucumber/is_it_friday.feature --format-options='{\"junit\": {\"suiteName\":\"mySuite\"} }' --format junit:tests/cucumber/output.xml  ",
+    "test": "npm run jest-test"
+  },
+  "dependencies": {
+    "jasmine": "^5.1.0",
+    "jasmine-reporters": "^2.5.2",
+    "moment": "^2.30.1"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^11.0.1",
+    "@playwright/test": "^1.44.1",
+    "@tsconfig/node20": "^20.1.2",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.30",
+    "@typescript-eslint/eslint-plugin": "^7.3.1",
+    "browserify": "^17.0.0",
+    "chai": "^5.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jest": "^27.9.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prefer-arrow-functions": "^3.3.2",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-simple-import-sort": "^12.0.0",
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "karma": "^6.4.4",
+    "karma-browserify": "^8.1.0",
+    "karma-chrome-launcher": "^3.2.0",
+    "karma-junit-reporter": "^2.0.1",
+    "karma-mocha": "^2.0.1",
+    "karma-requirejs": "^1.1.0",
+    "mocha": "^8.4.0",
+    "mocha-junit-reporter": "^2.0.0",
+    "typescript": "^5.4.3"
+  }
+}

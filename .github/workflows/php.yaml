@@ -1,0 +1,39 @@
+name: PHP Tests
+
+on:
+  schedule:
+    - cron: 0 */6 * * *
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install lib sodium
+        run: |
+          sudo apt update
+          sudo apt install -y libsodium-dev libsodium23
+
+      - name: Setup PHP Action
+        uses: shivammathur/setup-php@2.31.1
+        with:
+          php-version: 8.3.10
+          tools: php-cs-fixer, phpunit
+          ini-values: error_reporting=-1, display_errors=On
+
+      - name: Run phpunit tests
+        uses: ./.github/actions/analytics-uploader-wrapper
+        with:
+          token-staging: ${{ secrets.TRUNK_STAGING_ORG_API_TOKEN }}
+          token-prod: ${{ secrets.TRUNK_PROD_ORG_API_TOKEN }}
+          token-dev: ${{ secrets.TRUNK_DEV_ORG_API_TOKEN }}
+          token-dev2: ${{ secrets.TRUNK_DEV2_ORG_API_TOKEN }}
+          cli-version: ${{ inputs.cli-version }}
+          junit-paths: "**/*_test.xml"
+          run:
+            phpunit -c php/phpunit/phpunit.xml --bootstrap php/phpunit/src/autoload.php --log-junit
+            tests/phpunit_test.xml

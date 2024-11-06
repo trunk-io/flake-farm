@@ -1,0 +1,74 @@
+name: Javascript Tests
+
+on:
+  schedule:
+    - cron: 0 */6 * * *
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Install Dependencies
+        run: |
+          pnpm install
+
+      - name: Run Mocha Tests
+        uses: ./.github/actions/analytics-uploader-wrapper
+        with:
+          token-staging: ${{ secrets.TRUNK_STAGING_ORG_API_TOKEN }}
+          token-prod: ${{ secrets.TRUNK_PROD_ORG_API_TOKEN }}
+          token-dev: ${{ secrets.TRUNK_DEV_ORG_API_TOKEN }}
+          token-dev2: ${{ secrets.TRUNK_DEV2_ORG_API_TOKEN }}
+          cli-version: ${{ inputs.cli-version }}
+          junit-paths: "**/mocha_test.xml"
+          run: npm run mocha-test
+
+      - name: Run Jest Tests
+        if: ${{ always() }}
+        uses: ./.github/actions/analytics-uploader-wrapper
+        with:
+          token-staging: ${{ secrets.TRUNK_STAGING_ORG_API_TOKEN }}
+          token-prod: ${{ secrets.TRUNK_PROD_ORG_API_TOKEN }}
+          token-dev: ${{ secrets.TRUNK_DEV_ORG_API_TOKEN }}
+          token-dev2: ${{ secrets.TRUNK_DEV2_ORG_API_TOKEN }}
+          cli-version: ${{ inputs.cli-version }}
+          junit-paths: "**/*_test.xml,**/junitresults-*.xml"
+          run: npm run jest-test
+
+      - name: Run Jasmine Tests
+        if: ${{ always() }}
+        uses: ./.github/actions/analytics-uploader-wrapper
+        with:
+          token-staging: ${{ secrets.TRUNK_STAGING_ORG_API_TOKEN }}
+          token-prod: ${{ secrets.TRUNK_PROD_ORG_API_TOKEN }}
+          token-dev: ${{ secrets.TRUNK_DEV_ORG_API_TOKEN }}
+          token-dev2: ${{ secrets.TRUNK_DEV2_ORG_API_TOKEN }}
+          cli-version: ${{ inputs.cli-version }}
+          junit-paths: "**/*_test.xml,**/junitresults-*.xml"
+          run: npm run jasmine-test
+
+      - name: Run Playwright Tests
+        if: ${{ always() }}
+        uses: ./.github/actions/analytics-uploader-wrapper
+        with:
+          token-staging: ${{ secrets.TRUNK_STAGING_ORG_API_TOKEN }}
+          token-prod: ${{ secrets.TRUNK_PROD_ORG_API_TOKEN }}
+          token-dev: ${{ secrets.TRUNK_DEV_ORG_API_TOKEN }}
+          token-dev2: ${{ secrets.TRUNK_DEV2_ORG_API_TOKEN }}
+          cli-version: ${{ inputs.cli-version }}
+          junit-paths: "**/*_test.xml,**/junitresults-*.xml"
+          run: npm run playwright-test

@@ -1,0 +1,36 @@
+name: Bazel Tests
+
+permissions: read-all
+
+on:
+  schedule:
+    - cron: 0 */6 * * *
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Run tests
+        run: bazel test //bazel/gtest:hello_test
+        continue-on-error: true
+
+      - name: Upload results
+        # Run this step even if the test step ahead fails
+        if: !cancelled()
+        uses: trunk-io/analytics-uploader@main
+        with:
+          # Path to your test results.
+          junit-paths: "bazel-testlogs/**/test.xml"
+          # Provide your Trunk organization slug.
+          org-slug: trunk-io
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+        continue-on-error: true          

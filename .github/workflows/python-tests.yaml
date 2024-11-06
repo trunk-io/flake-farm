@@ -1,0 +1,50 @@
+name: Python Tests
+
+on:
+  schedule:
+    - cron: 0 */6 * * *
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest tests
+        uses: ./.github/actions/analytics-uploader-wrapper
+        with:
+          token-staging: ${{ secrets.TRUNK_STAGING_ORG_API_TOKEN }}
+          token-prod: ${{ secrets.TRUNK_PROD_ORG_API_TOKEN }}
+          token-dev: ${{ secrets.TRUNK_DEV_ORG_API_TOKEN }}
+          token-dev2: ${{ secrets.TRUNK_DEV2_ORG_API_TOKEN }}
+          cli-version: ${{ inputs.cli-version }}
+          junit-paths: "**/*_test.xml"
+          run:
+            pytest python/pytest/** --junitxml=python/results/pytest/pytest_test.xml -o
+            junit_family=xunit1
+
+      - name: Run robotframework tests
+        uses: ./.github/actions/analytics-uploader-wrapper
+        if: ${{ always() }}
+        with:
+          token-staging: ${{ secrets.TRUNK_STAGING_ORG_API_TOKEN }}
+          token-prod: ${{ secrets.TRUNK_PROD_ORG_API_TOKEN }}
+          token-dev: ${{ secrets.TRUNK_DEV_ORG_API_TOKEN }}
+          token-dev2: ${{ secrets.TRUNK_DEV2_ORG_API_TOKEN }}
+          cli-version: ${{ inputs.cli-version }}
+          junit-paths: "**/*_test.xml"
+          run:
+            pabot --testlevelsplit --outputdir=python/results/robotframework --output=robot_test.xml
+            python/robotframework/**
