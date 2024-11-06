@@ -14,6 +14,8 @@ jobs:
 
       - name: trunk install
         uses: trunk-io/trunk-action/install@v1
+        with:
+          tools: gh
 
       - name: Merge active change
         env:
