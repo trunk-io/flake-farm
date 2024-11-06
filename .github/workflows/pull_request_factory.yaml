@@ -32,18 +32,9 @@ jobs:
         with:
           ref: main
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@nightly
-
-      - name: trunk install
-        uses: trunk-io/trunk-action/install@v1
-
       - name: run switch season
         id: switch
         run: javascript/src/season/flip
-
-      - name: run test generator
-        run: cargo run --manifest-path=./rust/Cargo.toml
 
       - name: choose next
         id: choose-next
