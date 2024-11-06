@@ -53,7 +53,7 @@ jobs:
           # Provide your Trunk organization slug.
           org-slug: trunk-io
           # Provide your Trunk API token as a GitHub secret.
-          token: ${{ secrets.TRUNK_API_TOKEN }}
+          token: ${{ secrets.TRUNK_TOKEN }}
         continue-on-error: true
 
       - name: upload artifacts
