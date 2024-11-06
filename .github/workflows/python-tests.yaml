@@ -22,28 +22,26 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run pytest tests
-        uses: ./.github/actions/analytics-uploader-wrapper
-        with:
-          token-staging: ${{ secrets.TRUNK_STAGING_ORG_API_TOKEN }}
-          token-prod: ${{ secrets.TRUNK_PROD_ORG_API_TOKEN }}
-          token-dev: ${{ secrets.TRUNK_DEV_ORG_API_TOKEN }}
-          token-dev2: ${{ secrets.TRUNK_DEV2_ORG_API_TOKEN }}
-          cli-version: ${{ inputs.cli-version }}
-          junit-paths: "**/*_test.xml"
-          run:
-            pytest python/pytest/** --junitxml=python/results/pytest/pytest_test.xml -o
-            junit_family=xunit1
-
-      - name: Run robotframework tests
-        uses: ./.github/actions/analytics-uploader-wrapper
         if: ${{ always() }}
+        run:
+          pytest python/pytest/** --junitxml=python/results/pytest/pytest_test.xml -o
+          junit_family=xunit1
+
+      - name: Run robotframework tests        
+        if: ${{ always() }}
+        run:
+          pabot --testlevelsplit --outputdir=python/results/robotframework --output=robot_test.xml
+          python/robotframework/**
+
+      - name: Upload results
+        # Run this step even if the test step ahead fails
+        if: !cancelled()
+        uses: trunk-io/analytics-uploader@main
         with:
-          token-staging: ${{ secrets.TRUNK_STAGING_ORG_API_TOKEN }}
-          token-prod: ${{ secrets.TRUNK_PROD_ORG_API_TOKEN }}
-          token-dev: ${{ secrets.TRUNK_DEV_ORG_API_TOKEN }}
-          token-dev2: ${{ secrets.TRUNK_DEV2_ORG_API_TOKEN }}
-          cli-version: ${{ inputs.cli-version }}
+          # Path to your test results.
           junit-paths: "**/*_test.xml"
-          run:
-            pabot --testlevelsplit --outputdir=python/results/robotframework --output=robot_test.xml
-            python/robotframework/**
+          # Provide your Trunk organization slug.
+          org-slug: trunk-io
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_TOKEN }}
+        continue-on-error: true            
