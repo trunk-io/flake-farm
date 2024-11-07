@@ -28,7 +28,7 @@ jobs:
 
       - name: Upload results
         # Run this step even if the test step ahead fails
-        if: !cancelled()
+        if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
         with:
           # Path to your test results.
