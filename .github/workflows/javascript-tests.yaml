@@ -15,19 +15,22 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
 
       - uses: pnpm/action-setup@v3
         with:
-          version: 8
+          version: 9
 
       - name: Install Dependencies
         run: |
           pnpm install
+          sudo npx playwright install-deps          
 
       - name: Run Mocha Tests
         if: ${{ always() }}
-        run: npm run mocha-test
+        run: 
+          npm run mocha-test
+          cat javascript/tests/mocha/mocha_test.xml
 
       - name: Run Jest Tests
         if: ${{ always() }}
