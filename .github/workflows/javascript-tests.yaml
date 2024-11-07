@@ -32,6 +32,7 @@ jobs:
         run: |
           npm run mocha-test
           cat javascript/tests/mocha/mocha_test.xml
+          echo "Mocha tests complete"
 
       - name: Run Jest Tests
         if: ${{ always() }}
