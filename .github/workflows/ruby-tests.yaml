@@ -19,7 +19,7 @@ jobs:
           bundler-cache: true
 
       - name: Run rspec tests
-        if: ${{ always() }}  
+        if: ${{ always() }}
         run: bundle exec rspec ruby/rspec --format RspecJunitFormatter --out rspec_test.xml
 
       - name: Run minitest tests
@@ -37,4 +37,4 @@ jobs:
           org-slug: trunk-io
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
-        continue-on-error: true          
+        continue-on-error: true

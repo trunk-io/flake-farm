@@ -27,7 +27,7 @@ jobs:
           pytest python/pytest/** --junitxml=python/results/pytest/pytest_test.xml -o
           junit_family=xunit1
 
-      - name: Run robotframework tests        
+      - name: Run robotframework tests
         if: ${{ always() }}
         run:
           pabot --testlevelsplit --outputdir=python/results/robotframework --output=robot_test.xml
@@ -44,4 +44,4 @@ jobs:
           org-slug: trunk-io
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
-        continue-on-error: true            
+        continue-on-error: true

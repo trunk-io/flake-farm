@@ -20,11 +20,11 @@ jobs:
           cache: maven
 
       - name: Run tests with Gradle
-        if: ${{ always() }}        
+        if: ${{ always() }}
         run: gradle test --project-dir java/gradle
 
       - name: Run playwright tests with Maven
-        if: ${{ always() }}        
+        if: ${{ always() }}
         run: mvn test --file java/playwright/pom.xml --quiet
 
       - name: Run tests with Maven
@@ -37,11 +37,11 @@ jobs:
         uses: trunk-io/analytics-uploader@main
         with:
           # Path to your test results.
-          junit-paths: "**/gradle/**/test-results/**/*.xml, **/surefire-reports/*.xml, **/playwright/**/surefire-reports/*.xml"
+          junit-paths:
+            "**/gradle/**/test-results/**/*.xml, **/surefire-reports/*.xml,
+            **/playwright/**/surefire-reports/*.xml"
           # Provide your Trunk organization slug.
           org-slug: trunk-io
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
         continue-on-error: true
-
-
