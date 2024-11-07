@@ -43,7 +43,7 @@ jobs:
           # Path to your test results.
           junit-paths: "**/go-junit-report_test.xml, **/gotestsum_test.xml"
           # Provide your Trunk organization slug.
-          org-slug: trunk-io
+          org-slug: trunk
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
         continue-on-error: true
