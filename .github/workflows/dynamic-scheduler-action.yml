@@ -19,7 +19,7 @@ on:
 
 jobs:
   call-dynamic-scheduler:
-    runs-on: ubuntu-latest
+    runs-on: eli
     steps:
       - name: Call Dynamic Scheduler API
         id: scheduler

@@ -1,0 +1,10 @@
+name: 'Dynamic Scheduler'
+description: 'A dynamic scheduler action'
+runs:
+  using: "composite"
+  steps:
+    - name: Run dynamic scheduler
+      shell: bash
+      run: |
+        echo "Dynamic scheduler completed"
+        exit 0 
