@@ -3,6 +3,8 @@ description: 'A dynamic scheduler action'
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v4
+
     - name: Run dynamic scheduler
       shell: bash
       run: |
