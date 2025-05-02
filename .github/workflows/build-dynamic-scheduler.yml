@@ -1,12 +1,6 @@
 name: Build Dynamic Scheduler
 
 on:
-  push:
-    paths:
-      - '.github/actions/dynamic-scheduler/**'
-  pull_request:
-    paths:
-      - '.github/actions/dynamic-scheduler/**'
   workflow_dispatch:
 
 jobs:
@@ -18,9 +12,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: '.github/actions/dynamic-scheduler/package-lock.json'
+          node-version: 20
+          cache: npm
+          cache-dependency-path: .github/actions/dynamic-scheduler/package-lock.json
 
       - name: Build Action
         working-directory: .github/actions/dynamic-scheduler
@@ -36,7 +30,6 @@ jobs:
           echo "✅ Build verified successfully"
 
       - name: Commit Build Artifacts
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
