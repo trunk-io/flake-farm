@@ -93,7 +93,7 @@ async function run() {
             core.setFailed(error.message);
         }
         else {
-            core.setFailed('An unknown error occurred');
+            core.setFailed('An unknown error occurred - boo');
         }
     }
 }
