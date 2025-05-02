@@ -1,0 +1,97 @@
+name: Dynamic Scheduler Action
+
+on:
+  workflow_dispatch:
+    inputs:
+      workflow_file:
+        description: Path to the workflow file
+        required: false
+        type: string
+      repository_name:
+        description: Repository name in format owner/repo
+        required: true
+        type: string
+      debug:
+        description: Enable debug mode to include workflow content in response
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  call-dynamic-scheduler:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Dynamic Scheduler API
+        id: scheduler
+        run: |
+          # Construct the API URL - replace with your actual API URL
+          API_URL="http://localhost:3000/api/dynamic-scheduler"
+          
+          # Get the current workflow name from GitHub environment
+          WORKFLOW_NAME="${{ github.workflow }}"
+          echo "Using workflow name: $WORKFLOW_NAME"
+          
+          # Construct the request body
+          if [ -n "${{ github.event.inputs.workflow_file }}" ]; then
+            # If workflow_file is specified, only use that
+            REQUEST_BODY=$(jq -n \
+              --arg workflow_file "${{ github.event.inputs.workflow_file }}" \
+              --arg repository_name "${{ github.event.inputs.repository_name }}" \
+              --argjson debug "${{ github.event.inputs.debug }}" \
+              '{
+                workflow_file: $workflow_file,
+                repository_name: $repository_name,
+                debug: $debug
+              } | del(.[] | select(. == "" or . == null))')
+          else
+            # If no workflow_file, use the workflow name
+            REQUEST_BODY=$(jq -n \
+              --arg workflow_name "$WORKFLOW_NAME" \
+              --arg repository_name "${{ github.event.inputs.repository_name }}" \
+              --argjson debug "${{ github.event.inputs.debug }}" \
+              '{
+                workflow_name: $workflow_name,
+                repository_name: $repository_name,
+                debug: $debug
+              } | del(.[] | select(. == "" or . == null))')
+          fi
+          
+          # Make the API call
+          RESPONSE=$(curl -s -X POST "$API_URL" \
+            -H "Content-Type: application/json" \
+            -d "$REQUEST_BODY")
+          
+          # Parse the response
+          JOB_NAMES=$(echo "$RESPONSE" | jq -r '.jobNames[]')
+          WORKFLOW_PATH=$(echo "$RESPONSE" | jq -r '.workflowPath')
+          
+          # Set outputs for other steps to use
+          echo "jobNames<<EOF" >> $GITHUB_OUTPUT
+          echo "$JOB_NAMES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "workflowPath=$WORKFLOW_PATH" >> $GITHUB_OUTPUT
+          
+          # If debug is enabled, also output the content
+          if [ "${{ github.event.inputs.debug }}" = "true" ]; then
+            CONTENT=$(echo "$RESPONSE" | jq -r '.content')
+            echo "content<<EOF" >> $GITHUB_OUTPUT
+            echo "$CONTENT" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+          
+          # Print the response for debugging
+          echo "API Response:"
+          echo "$RESPONSE" | jq '.'
+
+      - name: Use Job Names
+        run: |
+          echo "Found job names:"
+          echo "${{ steps.scheduler.outputs.jobNames }}"
+          
+          echo "Workflow path: ${{ steps.scheduler.outputs.workflowPath }}"
+          
+          if [ "${{ github.event.inputs.debug }}" = "true" ]; then
+            echo "Workflow content:"
+            echo "${{ steps.scheduler.outputs.content }}"
+          fi 
