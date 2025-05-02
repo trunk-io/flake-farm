@@ -4,9 +4,13 @@ on:
   pull_request: {}
 
 jobs:
+      
+
   scheduler:
     runs-on: eli
     steps:
+      - uses: actions/checkout@v4
+
       - name: dynamic-scheduler
         uses: ./.github/actions/dynamic-scheduler
 
