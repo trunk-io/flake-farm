@@ -32,9 +32,19 @@ echo "📦 Packaging action..."
 npm run package
 
 # Verify the build
-if [ ! -f "dist/index.js" ]; then
-    echo "❌ Build failed: dist/index.js not found"
-    exit 1
-fi
+echo "🔍 Verifying build files..."
+required_files=(
+    "dist/index.js"
+    "dist/index.js.map"
+    "dist/licenses.txt"
+    "dist/sourcemap-register.js"
+)
+
+for file in "${required_files[@]}"; do
+    if [ ! -f "$file" ]; then
+        echo "❌ Build failed: $file not found"
+        exit 1
+    fi
+done
 
 echo "✅ Build completed successfully!" 

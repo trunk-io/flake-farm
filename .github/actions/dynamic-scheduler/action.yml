@@ -4,9 +4,6 @@ inputs:
   workflow_file:
     description: Optional path to the workflow file
     required: false
-  repository_name:
-    description: Optional repository name
-    required: false
   debug:
     description: Enable debug mode
     required: false
@@ -19,5 +16,5 @@ outputs:
   content:
     description: Workflow content (only when debug is true)
 runs:
-  using: "node20"
-  main: "dist/index.js" 
+  using: node20
+  main: dist/index.js 
