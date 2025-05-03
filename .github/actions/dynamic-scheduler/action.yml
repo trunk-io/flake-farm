@@ -7,7 +7,7 @@ inputs:
   debug:
     description: Enable debug mode
     required: false
-    default: 'false'
+    default: 'true'
 outputs:
   jobNames:
     description: List of job names from the API response

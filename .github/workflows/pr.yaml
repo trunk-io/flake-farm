@@ -13,6 +13,8 @@ jobs:
 
       - name: dynamic-scheduler
         uses: ./.github/actions/dynamic-scheduler
+        with:
+            debug: true
 
   step1:
     needs: scheduler
