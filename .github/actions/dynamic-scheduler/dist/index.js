@@ -56,9 +56,12 @@ async function run() {
         const repositoryName = github.context.repo.repo;
         const repositoryOwner = github.context.repo.owner;
         const fullRepositoryName = `${repositoryOwner}/${repositoryName}`;
+        // Get commit SHA from context
+        const commitSha = github.context.sha;
         // Construct request body
         const requestBody = {
             repository_name: fullRepositoryName,
+            commit_sha: commitSha,
             debug
         };
         if (workflowFile) {
