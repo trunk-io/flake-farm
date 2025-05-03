@@ -50,12 +50,15 @@ async function run() {
     try {
         // Get inputs
         const workflowFile = core.getInput('workflow_file');
-        const repositoryName = core.getInput('repository_name');
         const debug = core.getBooleanInput('debug');
         const workflowName = github.context.workflow;
+        // Get repository name from context
+        const repositoryName = github.context.repo.repo;
+        const repositoryOwner = github.context.repo.owner;
+        const fullRepositoryName = `${repositoryOwner}/${repositoryName}`;
         // Construct request body
         const requestBody = {
-            repository_name: repositoryName || undefined,
+            repository_name: fullRepositoryName,
             debug
         };
         if (workflowFile) {
@@ -93,7 +96,7 @@ async function run() {
             core.setFailed(error.message);
         }
         else {
-            core.setFailed('An unknown error occurred - boo');
+            core.setFailed('An unknown error occurred');
         }
     }
 }
