@@ -22,20 +22,20 @@ jobs:
           echo "Skip output contents:"
           echo "${{ steps.dynamic-scheduler.outputs.skip }}"
 
-  step0:
-    needs: scheduler
-    runs-on: eli
-    steps:
-      - name: Debug Skip JSON
-        run: |
-          echo "Raw skip output:"
-          echo "${{ needs.scheduler.outputs.skip }}"
-          echo "Parsed skip JSON:"
-          echo "${{ fromJSON(needs.scheduler.outputs.skip) }}"
-          echo "Individual skip values:"
-          echo "step1: ${{ fromJSON(needs.scheduler.outputs.skip).step1 }}"
-          echo "step2: ${{ fromJSON(needs.scheduler.outputs.skip).step2 }}"
-          echo "step3: ${{ fromJSON(needs.scheduler.outputs.skip).step3 }}"
+  # step0:
+  #   needs: scheduler
+  #   runs-on: eli
+  #   steps:
+  #     - name: Debug Skip JSON
+  #       run: |
+  #         echo "Raw skip output:"
+  #         echo "${{ needs.scheduler.outputs.skip }}"
+  #         echo "Parsed skip JSON:"
+  #         echo "${{ fromJSON(needs.scheduler.outputs.skip) }}"
+  #         echo "Individual skip values:"
+  #         echo "step1: ${{ fromJSON(needs.scheduler.outputs.skip).step1 }}"
+  #         echo "step2: ${{ fromJSON(needs.scheduler.outputs.skip).step2 }}"
+  #         echo "step3: ${{ fromJSON(needs.scheduler.outputs.skip).step3 }}"
 
   step1:
     needs: scheduler
