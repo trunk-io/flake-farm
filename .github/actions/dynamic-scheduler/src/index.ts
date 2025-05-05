@@ -6,6 +6,11 @@ interface SchedulerResponse {
   jobNames: string[];
   workflowPath: string;
   content?: string;
+  skip?: {
+    step1: boolean;
+    step2: boolean;
+    step3: boolean;
+  };
 }
 
 async function run(): Promise<void> {
@@ -57,6 +62,14 @@ async function run(): Promise<void> {
     // Set outputs
     core.setOutput('jobNames', response.data.jobNames.join('\n'));
     core.setOutput('workflowPath', response.data.workflowPath);
+
+    // Set skip flags if provided, otherwise set defaults
+    const skipFlags = response.data.skip || {
+      step1: false,
+      step2: false,
+      step3: false
+    };
+    core.setOutput('skip', JSON.stringify(skipFlags));
 
     if (debug && response.data.content) {
       core.setOutput('content', response.data.content);

@@ -4,20 +4,22 @@ on:
   pull_request: {}
 
 jobs:
-      
-
   scheduler:
     runs-on: eli
+    outputs:
+      skip: ${{ steps.dynamic-scheduler.outputs.skip }}
     steps:
       - uses: actions/checkout@v4
 
       - name: dynamic-scheduler
+        id: dynamic-scheduler
         uses: ./.github/actions/dynamic-scheduler
         with:
             debug: true
 
   step1:
     needs: scheduler
+    if: ${{ fromJSON(needs.scheduler.outputs.skip).step1 }}
     runs-on: eli
     steps:
       - name: Step 1
@@ -27,6 +29,7 @@ jobs:
 
   step2:
     needs: scheduler
+    if: ${{ fromJSON(needs.scheduler.outputs.skip).step2 }}
     runs-on: eli
     steps:
       - name: Step 2
@@ -36,6 +39,7 @@ jobs:
 
   step3:
     needs: scheduler
+    if: ${{ fromJSON(needs.scheduler.outputs.skip).step3 }}
     runs-on: eli
     steps:
       - name: Step 3
