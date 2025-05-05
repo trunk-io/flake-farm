@@ -85,20 +85,16 @@ async function run() {
         // Set outputs
         core.setOutput('jobNames', response.data.jobNames.join('\n'));
         core.setOutput('workflowPath', response.data.workflowPath);
-        // Set skip flags if provided, otherwise set defaults
-        const skipFlags = response.data.skip || {
-            step1: false,
-            step2: false,
-            step3: false
-        };
-        core.setOutput('skip', JSON.stringify(skipFlags));
+        core.setOutput('skip', JSON.stringify(response.data.skip));
         if (debug && response.data.content) {
-            core.setOutput('content', response.data.content);
+            core.setOutput('workflow_file_content', response.data.content);
         }
         // Log response for debugging
         if (debug) {
             core.info('API Response:');
             core.info(JSON.stringify(response.data, null, 2));
+            core.info('Skip Json Info:');
+            core.info(JSON.stringify(response.data.skip));
         }
     }
     catch (error) {
