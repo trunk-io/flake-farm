@@ -66,3 +66,13 @@ jobs:
         run: |
           sleep 10
           exit 0 
+
+  step4:
+      needs: scheduler
+      if: ${{ !fromJSON(needs.scheduler.outputs.skip).step4 }}
+      runs-on: eli
+      steps:
+        - name: Step 4
+          run: |
+            sleep 10
+            exit 0           
