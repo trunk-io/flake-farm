@@ -24,6 +24,9 @@ async function run(): Promise<void> {
     // Get commit SHA from context
     const commitSha = github.context.sha;
 
+    // Get pull request number from context
+    const pullRequestNumber = github.context.payload.pull_request?.number;
+
     // Construct request body
     const requestBody: Record<string, any> = {
       repository_name: fullRepositoryName,
@@ -35,6 +38,10 @@ async function run(): Promise<void> {
       requestBody.workflow_file = workflowFile;
     } else {
       requestBody.workflow_name = workflowName;
+    }
+
+    if (pullRequestNumber) {
+      requestBody.pull_request_number = pullRequestNumber;
     }
 
     // Remove empty or null values
