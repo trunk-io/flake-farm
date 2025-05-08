@@ -32,7 +32,7 @@ jobs:
         env:
           GORUNNER: GOTESTSUM
         # we pass in env GORUNNER so that a unique retry file will be created
-        run: gotestsum --rerun-fails=3 --junitfile gotestsum_test.xml
+        run: gotestsum --rerun-fails=3 --junitfile go-gotestsum_test.xml
         working-directory: go/src
 
       - name: Upload results
@@ -41,7 +41,7 @@ jobs:
         uses: trunk-io/analytics-uploader@main
         with:
           # Path to your test results.
-          junit-paths: "**/go-junit-report_test.xml, **/gotestsum_test.xml"
+          junit-paths: "**/go-*_test.xml"
           # Provide your Trunk organization slug.
           org-slug: trunk
           # Provide your Trunk API token as a GitHub secret.
