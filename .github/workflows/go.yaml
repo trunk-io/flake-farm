@@ -22,7 +22,7 @@ jobs:
 
       - name: Run tests with go-junit-report
         shell: bash
-        run: GORUNNER=NONE go test -json 2>&1 | go-junit-report -parser gojson -out go-junit-report_test.xml
+        run: GORUNNER=NONE go test -v 2>&1 | go-junit-report -out go-junit-report_test.xml
         working-directory: go/src
         continue-on-error: true
 
