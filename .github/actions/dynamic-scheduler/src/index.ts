@@ -23,6 +23,11 @@ async function hasExistingComment(octokit: ReturnType<typeof github.getOctokit>,
   );
 }
 
+function formatMessage(message: string): string {
+  // Replace any repository references with code blocks
+  return message.replace(/([a-zA-Z0-9-]+)\/([a-zA-Z0-9-]+)/g, '`$1/$2`');
+}
+
 async function postPRComment(message: string): Promise<void> {
   const token = core.getInput('github_token');
   if (!token) {
@@ -39,8 +44,7 @@ async function postPRComment(message: string): Promise<void> {
       
       if (!hasComment) {
         const formattedMessage = `⚠️ **dynamic-scheduler warning**\n\n` +
-          `The dynamic-scheduler service encountered an issue while processing workflow for \`${context.repo.owner}/${context.repo.repo}\`:\n\n` +
-          `> ${message}\n\n` +
+          `> ${formatMessage(message)}\n\n` +
           `As a fallback all jobs will be run`;
 
         await octokit.rest.issues.createComment({
