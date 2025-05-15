@@ -50,6 +50,11 @@ async function run(): Promise<void> {
     }
   });
 
+  // Set default outputs in case of failure
+  core.setOutput('jobNames', '');
+  core.setOutput('workflowPath', '');
+  core.setOutput('skip', JSON.stringify({}));
+
   try {
     // Make API call
     const response = await axios.post<SchedulerResponse>(

@@ -80,6 +80,10 @@ async function run() {
             delete requestBody[key];
         }
     });
+    // Set default outputs in case of failure
+    core.setOutput('jobNames', '');
+    core.setOutput('workflowPath', '');
+    core.setOutput('skip', JSON.stringify({}));
     try {
         // Make API call
         const response = await axios_1.default.post('http://localhost:3000/api/dynamic-scheduler', requestBody, {
