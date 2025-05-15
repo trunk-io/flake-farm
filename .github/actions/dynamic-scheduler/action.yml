@@ -8,6 +8,9 @@ inputs:
     description: Enable debug logging
     required: false
     default: 'false'
+  github_token:
+    description: GitHub token for posting PR comments (optional)
+    required: false
 outputs:
   jobNames:
     description: List of job names from the API response

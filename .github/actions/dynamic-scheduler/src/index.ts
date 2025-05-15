@@ -24,7 +24,12 @@ async function hasExistingComment(octokit: ReturnType<typeof github.getOctokit>,
 }
 
 async function postPRComment(message: string): Promise<void> {
-  const octokit = github.getOctokit(process.env.GITHUB_TOKEN || '');
+  const token = core.getInput('github_token');
+  if (!token) {
+    return; // Skip if no token provided
+  }
+
+  const octokit = github.getOctokit(token);
   const context = github.context;
 
   if (context.payload.pull_request) {
@@ -142,7 +147,7 @@ async function run(): Promise<void> {
       }
     }
 
-    // Post error message to PR if this is a PR
+    // Post error message to PR if this is a PR and we have a token
     await postPRComment(`❌ Dynamic Scheduler Error: ${errorMessage}`);
     
     core.setFailed(errorMessage);
