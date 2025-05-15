@@ -81,19 +81,27 @@ async function run(): Promise<void> {
         core.info(JSON.stringify(response.data.skip))
       }
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 403) {
-        // For 403 errors, output the error message from the service
-        const errorMessage = error.response.data?.message || 'Access forbidden';
-        
-        if (debug) {
-          core.info('Error Response:');
-          core.info(JSON.stringify(error.response.data, null, 2));
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 403) {
+          // For 403 errors, just show warning and continue
+          const errorMessage = error.response.data?.message || 'Access forbidden';
+          if (debug) {
+            core.info('Error Response:');
+            core.info(JSON.stringify(error.response.data, null, 2));
+          }
+          core.warning(errorMessage);
+        } else {
+          // For all other errors, show warning that all jobs will run
+          const errorMessage = error.response?.data?.message || 'Service error';
+          if (debug) {
+            core.info('Error Response:');
+            core.info(JSON.stringify(error.response?.data, null, 2));
+          }
+          core.warning(`Dynamic scheduler service error: ${errorMessage}. All jobs will be run.`);
         }
-        
-        core.setFailed(errorMessage);
       } else {
-        // For other errors, rethrow to be caught by outer try-catch
-        throw error;
+        // For non-Axios errors, show generic warning
+        core.warning('Dynamic scheduler service error. All jobs will be run.');
       }
     }
 
