@@ -8,6 +8,10 @@ inputs:
     description: Enable debug mode
     required: false
     default: 'true'
+  continue_on_error:
+    description: Continue workflow execution if this step fails
+    required: false
+    default: 'false'
 outputs:
   jobNames:
     description: List of job names from the API response
@@ -19,4 +23,4 @@ outputs:
     description: JSON object containing skip flags for each step
 runs:
   using: node20
-  main: dist/index.js 
+  main: dist/index.js

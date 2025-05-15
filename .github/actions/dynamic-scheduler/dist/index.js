@@ -51,6 +51,7 @@ async function run() {
         // Get inputs
         const workflowFile = core.getInput('workflow_file');
         const debug = core.getBooleanInput('debug');
+        const continueOnError = core.getBooleanInput('continue_on_error');
         const workflowName = github.context.workflow;
         // Get repository name from context
         const repositoryName = github.context.repo.repo;
@@ -108,20 +109,46 @@ async function run() {
                 // For 403 errors, output the error message from the service
                 const errorMessage = error.response.data?.message || 'Access forbidden';
                 core.error(`Service returned 403: ${errorMessage}`);
-                core.setFailed(errorMessage);
+                if (!continueOnError) {
+                    core.setFailed(errorMessage);
+                }
+                else {
+                    core.warning(`Continuing despite error: ${errorMessage}`);
+                }
             }
             else {
-                // For other errors, rethrow to be caught by outer try-catch
-                throw error;
+                // For other errors, handle based on continueOnError setting
+                if (!continueOnError) {
+                    throw error;
+                }
+                else {
+                    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+                    core.warning(`Continuing despite error: ${errorMessage}`);
+                }
             }
         }
     }
     catch (error) {
         if (error instanceof Error) {
-            core.setFailed(error.message);
+            core.error(error.message);
+            const continueOnError = core.getBooleanInput('continue_on_error');
+            if (!continueOnError) {
+                core.setFailed(error.message);
+            }
+            else {
+                core.warning(`Continuing despite error: ${error.message}`);
+            }
         }
         else {
-            core.setFailed('An unknown error occurred');
+            const errorMessage = 'An unknown error occurred';
+            core.error(errorMessage);
+            const continueOnError = core.getBooleanInput('continue_on_error');
+            if (!continueOnError) {
+                core.setFailed(errorMessage);
+            }
+            else {
+                core.warning(`Continuing despite error: ${errorMessage}`);
+            }
         }
     }
 }
@@ -7044,7 +7071,7 @@ function save(namespaces) {
 function load() {
 	let r;
 	try {
-		r = exports.storage.getItem('debug');
+		r = exports.storage.getItem('debug') || exports.storage.getItem('DEBUG') ;
 	} catch (error) {
 		// Swallow
 		// XXX (@Qix-) should we be logging these?
@@ -7272,7 +7299,7 @@ function setup(env) {
 
 		const split = (typeof namespaces === 'string' ? namespaces : '')
 			.trim()
-			.replace(' ', ',')
+			.replace(/\s+/g, ',')
 			.split(',')
 			.filter(Boolean);
 
