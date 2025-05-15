@@ -47,95 +47,85 @@ const core = __importStar(__nccwpck_require__(7484));
 const github = __importStar(__nccwpck_require__(3228));
 const axios_1 = __importDefault(__nccwpck_require__(7269));
 async function run() {
+    // Get inputs
+    const workflowFile = core.getInput('workflow_file');
+    const debug = core.getBooleanInput('debug');
+    const workflowName = github.context.workflow;
+    // Get repository name from context
+    const repositoryName = github.context.repo.repo;
+    const repositoryOwner = github.context.repo.owner;
+    const fullRepositoryName = `${repositoryOwner}/${repositoryName}`;
+    // Get commit SHA from context
+    const commitSha = github.context.sha;
+    // Get pull request number from context
+    const pullRequestNumber = github.context.payload.pull_request?.number;
+    // Construct request body
+    const requestBody = {
+        repository_name: fullRepositoryName,
+        commit_sha: commitSha,
+        debug
+    };
+    if (workflowFile) {
+        requestBody.workflow_file = workflowFile;
+    }
+    else {
+        requestBody.workflow_name = workflowName;
+    }
+    if (pullRequestNumber) {
+        requestBody.pull_request_number = pullRequestNumber;
+    }
+    // Remove empty or null values
+    Object.keys(requestBody).forEach(key => {
+        if (requestBody[key] === undefined || requestBody[key] === null || requestBody[key] === '') {
+            delete requestBody[key];
+        }
+    });
     try {
-        // Get inputs
-        const workflowFile = core.getInput('workflow_file');
-        const debug = core.getBooleanInput('debug');
-        const workflowName = github.context.workflow;
-        // Get repository name from context
-        const repositoryName = github.context.repo.repo;
-        const repositoryOwner = github.context.repo.owner;
-        const fullRepositoryName = `${repositoryOwner}/${repositoryName}`;
-        // Get commit SHA from context
-        const commitSha = github.context.sha;
-        // Get pull request number from context
-        const pullRequestNumber = github.context.payload.pull_request?.number;
-        // Construct request body
-        const requestBody = {
-            repository_name: fullRepositoryName,
-            commit_sha: commitSha,
-            debug
-        };
-        if (workflowFile) {
-            requestBody.workflow_file = workflowFile;
-        }
-        else {
-            requestBody.workflow_name = workflowName;
-        }
-        if (pullRequestNumber) {
-            requestBody.pull_request_number = pullRequestNumber;
-        }
-        // Remove empty or null values
-        Object.keys(requestBody).forEach(key => {
-            if (requestBody[key] === undefined || requestBody[key] === null || requestBody[key] === '') {
-                delete requestBody[key];
+        // Make API call
+        const response = await axios_1.default.post('http://localhost:3000/api/dynamic-scheduler', requestBody, {
+            headers: {
+                'Content-Type': 'application/json'
             }
         });
-        try {
-            // Make API call
-            const response = await axios_1.default.post('http://localhost:3000/api/dynamic-scheduler', requestBody, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            // Set outputs
-            core.setOutput('jobNames', response.data.jobNames.join('\n'));
-            core.setOutput('workflowPath', response.data.workflowPath);
-            core.setOutput('skip', JSON.stringify(response.data.skip));
-            if (debug && response.data.content) {
-                core.setOutput('workflow_file_content', response.data.content);
-            }
-            // Log response for debugging
-            if (debug) {
-                core.info('API Response:');
-                core.info(JSON.stringify(response.data, null, 2));
-                core.info('Skip Json Info:');
-                core.info(JSON.stringify(response.data.skip));
-            }
+        // Set outputs
+        core.setOutput('jobNames', response.data.jobNames.join('\n'));
+        core.setOutput('workflowPath', response.data.workflowPath);
+        core.setOutput('skip', JSON.stringify(response.data.skip));
+        if (debug && response.data.content) {
+            core.setOutput('workflow_file_content', response.data.content);
         }
-        catch (error) {
-            if (axios_1.default.isAxiosError(error)) {
-                if (error.response?.status === 403) {
-                    // For 403 errors, just show warning and continue
-                    const errorMessage = error.response.data?.message || 'Access forbidden';
-                    if (debug) {
-                        core.info('Error Response:');
-                        core.info(JSON.stringify(error.response.data, null, 2));
-                    }
-                    core.warning(errorMessage);
-                }
-                else {
-                    // For all other errors, show warning that all jobs will run
-                    const errorMessage = error.response?.data?.message || 'Service error';
-                    if (debug) {
-                        core.info('Error Response:');
-                        core.info(JSON.stringify(error.response?.data, null, 2));
-                    }
-                    core.warning(`Dynamic scheduler service error: ${errorMessage}. All jobs will be run.`);
-                }
-            }
-            else {
-                // For non-Axios errors, show generic warning
-                core.warning('Dynamic scheduler service error. All jobs will be run.');
-            }
+        // Log response for debugging
+        if (debug) {
+            core.info('API Response:');
+            core.info(JSON.stringify(response.data, null, 2));
+            core.info('Skip Json Info:');
+            core.info(JSON.stringify(response.data.skip));
         }
     }
     catch (error) {
-        if (error instanceof Error) {
-            core.setFailed(error.message);
+        if (axios_1.default.isAxiosError(error)) {
+            if (error.response?.status === 403) {
+                // For 403 errors, fail with access denied message
+                const errorMessage = error.response.data?.message || 'Access forbidden';
+                if (debug) {
+                    core.info('Error Response:');
+                    core.info(JSON.stringify(error.response.data, null, 2));
+                }
+                core.setFailed(`Access denied: ${errorMessage}`);
+            }
+            else {
+                // For all other errors, fail with service error message
+                const errorMessage = error.response?.data?.message || 'Service error';
+                if (debug) {
+                    core.info('Error Response:');
+                    core.info(JSON.stringify(error.response?.data, null, 2));
+                }
+                core.setFailed(`Dynamic scheduler service error: ${errorMessage}`);
+            }
         }
         else {
-            core.setFailed('An unknown error occurred');
+            // For non-Axios errors, fail with generic error message
+            core.setFailed('Dynamic scheduler service error');
         }
     }
 }
