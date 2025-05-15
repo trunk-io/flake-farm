@@ -46,6 +46,37 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7484));
 const github = __importStar(__nccwpck_require__(3228));
 const axios_1 = __importDefault(__nccwpck_require__(7269));
+async function hasExistingComment(octokit, prNumber) {
+    const context = github.context;
+    const comments = await octokit.rest.issues.listComments({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        issue_number: prNumber
+    });
+    return comments.data.some(comment => comment.user?.login === 'github-actions[bot]' &&
+        comment.body?.includes('Dynamic Scheduler Error'));
+}
+async function postPRComment(message) {
+    const octokit = github.getOctokit(process.env.GITHUB_TOKEN || '');
+    const context = github.context;
+    if (context.payload.pull_request) {
+        try {
+            // Check if we already have a comment
+            const hasComment = await hasExistingComment(octokit, context.payload.pull_request.number);
+            if (!hasComment) {
+                await octokit.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.payload.pull_request.number,
+                    body: message
+                });
+            }
+        }
+        catch (error) {
+            core.warning(`Failed to post PR comment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+}
 async function run() {
     // Get inputs
     const workflowFile = core.getInput('workflow_file');
@@ -107,30 +138,28 @@ async function run() {
         }
     }
     catch (error) {
+        let errorMessage = 'Dynamic scheduler service error';
         if (axios_1.default.isAxiosError(error)) {
             if (error.response?.status === 403) {
                 // For 403 errors, fail with access denied message
-                const errorMessage = error.response.data?.message || 'Access forbidden';
+                errorMessage = error.response.data?.message || 'Access forbidden';
                 if (debug) {
                     core.info('Error Response:');
                     core.info(JSON.stringify(error.response.data, null, 2));
                 }
-                core.setFailed(`Access denied: ${errorMessage}`);
             }
             else {
                 // For all other errors, fail with service error message
-                const errorMessage = error.response?.data?.message || 'Service error';
+                errorMessage = error.response?.data?.message || 'Service error';
                 if (debug) {
                     core.info('Error Response:');
                     core.info(JSON.stringify(error.response?.data, null, 2));
                 }
-                core.setFailed(`Dynamic scheduler service error: ${errorMessage}`);
             }
         }
-        else {
-            // For non-Axios errors, fail with generic error message
-            core.setFailed('Dynamic scheduler service error');
-        }
+        // Post error message to PR if this is a PR
+        await postPRComment(`❌ Dynamic Scheduler Error: ${errorMessage}`);
+        core.setFailed(errorMessage);
     }
 }
 run();
