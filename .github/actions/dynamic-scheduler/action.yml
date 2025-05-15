@@ -1,13 +1,13 @@
 name: Dynamic Scheduler
-description: A dynamic scheduler action for managing workflow steps
+description: Dynamically schedules jobs based on API response
 inputs:
   workflow_file:
-    description: Optional path to the workflow file
+    description: Path to the workflow file
     required: false
   debug:
-    description: Enable debug mode
+    description: Enable debug logging
     required: false
-    default: 'true'
+    default: 'false'
 outputs:
   jobNames:
     description: List of job names from the API response
