@@ -81,25 +81,39 @@ async function run() {
                 delete requestBody[key];
             }
         });
-        // Make API call
-        const response = await axios_1.default.post('http://localhost:3000/api/dynamic-scheduler', requestBody, {
-            headers: {
-                'Content-Type': 'application/json'
+        try {
+            // Make API call
+            const response = await axios_1.default.post('http://localhost:3000/api/dynamic-scheduler', requestBody, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            // Set outputs
+            core.setOutput('jobNames', response.data.jobNames.join('\n'));
+            core.setOutput('workflowPath', response.data.workflowPath);
+            core.setOutput('skip', JSON.stringify(response.data.skip));
+            if (debug && response.data.content) {
+                core.setOutput('workflow_file_content', response.data.content);
             }
-        });
-        // Set outputs
-        core.setOutput('jobNames', response.data.jobNames.join('\n'));
-        core.setOutput('workflowPath', response.data.workflowPath);
-        core.setOutput('skip', JSON.stringify(response.data.skip));
-        if (debug && response.data.content) {
-            core.setOutput('workflow_file_content', response.data.content);
+            // Log response for debugging
+            if (debug) {
+                core.info('API Response:');
+                core.info(JSON.stringify(response.data, null, 2));
+                core.info('Skip Json Info:');
+                core.info(JSON.stringify(response.data.skip));
+            }
         }
-        // Log response for debugging
-        if (debug) {
-            core.info('API Response:');
-            core.info(JSON.stringify(response.data, null, 2));
-            core.info('Skip Json Info:');
-            core.info(JSON.stringify(response.data.skip));
+        catch (error) {
+            if (axios_1.default.isAxiosError(error) && error.response?.status === 403) {
+                // For 403 errors, output the error message from the service
+                const errorMessage = error.response.data?.message || 'Access forbidden';
+                core.error(`Service returned 403: ${errorMessage}`);
+                core.setFailed(errorMessage);
+            }
+            else {
+                // For other errors, rethrow to be caught by outer try-catch
+                throw error;
+            }
         }
     }
     catch (error) {
