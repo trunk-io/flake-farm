@@ -107,7 +107,10 @@ async function run() {
             if (axios_1.default.isAxiosError(error) && error.response?.status === 403) {
                 // For 403 errors, output the error message from the service
                 const errorMessage = error.response.data?.message || 'Access forbidden';
-                core.error(`Service returned 403: ${errorMessage}`);
+                if (debug) {
+                    core.info('Error Response:');
+                    core.info(JSON.stringify(error.response.data, null, 2));
+                }
                 core.setFailed(errorMessage);
             }
             else {
