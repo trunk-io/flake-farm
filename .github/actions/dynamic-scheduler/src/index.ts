@@ -19,7 +19,7 @@ async function hasExistingComment(octokit: ReturnType<typeof github.getOctokit>,
 
   return comments.data.some(comment => 
     comment.user?.login === 'github-actions[bot]' && 
-    comment.body?.includes('Dynamic Scheduler Error')
+    comment.body?.includes('dynamic-scheduler warning')
   );
 }
 
@@ -38,11 +38,16 @@ async function postPRComment(message: string): Promise<void> {
       const hasComment = await hasExistingComment(octokit, context.payload.pull_request.number);
       
       if (!hasComment) {
+        const formattedMessage = `⚠️ **dynamic-scheduler warning**\n\n` +
+          `The dynamic-scheduler service encountered an issue while processing workflow for \`${context.repo.owner}/${context.repo.repo}\`:\n\n` +
+          `> ${message}\n\n` +
+          `As a fallback all jobs will be run`;
+
         await octokit.rest.issues.createComment({
           owner: context.repo.owner,
           repo: context.repo.repo,
           issue_number: context.payload.pull_request.number,
-          body: message
+          body: formattedMessage
         });
       }
     } catch (error) {
@@ -127,7 +132,7 @@ async function run(): Promise<void> {
       core.info(JSON.stringify(response.data.skip))
     }
   } catch (error) {
-    let errorMessage = 'Dynamic scheduler service error';
+    let errorMessage = 'dynamic-scheduler service error';
     
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 403) {
@@ -148,7 +153,7 @@ async function run(): Promise<void> {
     }
 
     // Post error message to PR if this is a PR and we have a token
-    await postPRComment(`❌ Dynamic Scheduler Error: ${errorMessage}`);
+    await postPRComment(errorMessage);
     
     core.setFailed(errorMessage);
   }

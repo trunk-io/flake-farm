@@ -54,7 +54,7 @@ async function hasExistingComment(octokit, prNumber) {
         issue_number: prNumber
     });
     return comments.data.some(comment => comment.user?.login === 'github-actions[bot]' &&
-        comment.body?.includes('Dynamic Scheduler Error'));
+        comment.body?.includes('dynamic-scheduler warning'));
 }
 async function postPRComment(message) {
     const token = core.getInput('github_token');
@@ -68,11 +68,15 @@ async function postPRComment(message) {
             // Check if we already have a comment
             const hasComment = await hasExistingComment(octokit, context.payload.pull_request.number);
             if (!hasComment) {
+                const formattedMessage = `⚠️ **dynamic-scheduler warning**\n\n` +
+                    `The dynamic-scheduler service encountered an issue while processing workflow for \`${context.repo.owner}/${context.repo.repo}\`:\n\n` +
+                    `> ${message}\n\n` +
+                    `As a fallback all jobs will be run`;
                 await octokit.rest.issues.createComment({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     issue_number: context.payload.pull_request.number,
-                    body: message
+                    body: formattedMessage
                 });
             }
         }
@@ -142,7 +146,7 @@ async function run() {
         }
     }
     catch (error) {
-        let errorMessage = 'Dynamic scheduler service error';
+        let errorMessage = 'dynamic-scheduler service error';
         if (axios_1.default.isAxiosError(error)) {
             if (error.response?.status === 403) {
                 // For 403 errors, fail with access denied message
@@ -162,7 +166,7 @@ async function run() {
             }
         }
         // Post error message to PR if this is a PR and we have a token
-        await postPRComment(`❌ Dynamic Scheduler Error: ${errorMessage}`);
+        await postPRComment(errorMessage);
         core.setFailed(errorMessage);
     }
 }
