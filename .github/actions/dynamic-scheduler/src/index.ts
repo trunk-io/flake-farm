@@ -23,9 +23,10 @@ async function hasExistingComment(octokit: ReturnType<typeof github.getOctokit>,
   );
 }
 
-function formatMessage(message: string): string {
-  // Replace any repository references with code blocks
-  return message.replace(/([a-zA-Z0-9-]+)\/([a-zA-Z0-9-]+)/g, '`$1/$2`');
+function formatMessage(message: string, owner: string, repo: string): string {
+  // Only format repository references that match the current repository
+  const repoPattern = new RegExp(`${owner}/${repo}`, 'g');
+  return message.replace(repoPattern, '`$&`');
 }
 
 async function postPRComment(message: string): Promise<void> {
@@ -44,7 +45,7 @@ async function postPRComment(message: string): Promise<void> {
       
       if (!hasComment) {
         const formattedMessage = `⚠️ **dynamic-scheduler warning**\n\n` +
-          `> ${formatMessage(message)}\n\n` +
+          `> ${formatMessage(message, context.repo.owner, context.repo.repo)}\n\n` +
           `As a fallback all jobs will be run`;
 
         await octokit.rest.issues.createComment({

@@ -56,9 +56,10 @@ async function hasExistingComment(octokit, prNumber) {
     return comments.data.some(comment => comment.user?.login === 'github-actions[bot]' &&
         comment.body?.includes('dynamic-scheduler warning'));
 }
-function formatMessage(message) {
-    // Replace any repository references with code blocks
-    return message.replace(/([a-zA-Z0-9-]+)\/([a-zA-Z0-9-]+)/g, '`$1/$2`');
+function formatMessage(message, owner, repo) {
+    // Only format repository references that match the current repository
+    const repoPattern = new RegExp(`${owner}/${repo}`, 'g');
+    return message.replace(repoPattern, '`$&`');
 }
 async function postPRComment(message) {
     const token = core.getInput('github_token');
@@ -73,7 +74,7 @@ async function postPRComment(message) {
             const hasComment = await hasExistingComment(octokit, context.payload.pull_request.number);
             if (!hasComment) {
                 const formattedMessage = `⚠️ **dynamic-scheduler warning**\n\n` +
-                    `> ${formatMessage(message)}\n\n` +
+                    `> ${formatMessage(message, context.repo.owner, context.repo.repo)}\n\n` +
                     `As a fallback all jobs will be run`;
                 await octokit.rest.issues.createComment({
                     owner: context.repo.owner,
