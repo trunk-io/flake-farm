@@ -99,7 +99,7 @@ async function run() {
     const repositoryOwner = github.context.repo.owner;
     const fullRepositoryName = `${repositoryOwner}/${repositoryName}`;
     // Get commit SHA from context
-    const commitSha = github.context.sha;
+    const commitSha = github.context.payload.pull_request?.head.sha || github.context.sha;
     // Get pull request number from context
     const pullRequestNumber = github.context.payload.pull_request?.number;
     // Construct request body
