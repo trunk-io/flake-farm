@@ -1,0 +1,25 @@
+name: Dynamic Scheduler
+description: Dynamically schedules jobs based on API response
+inputs:
+  workflow_file:
+    description: Path to the workflow file
+    required: false
+  debug:
+    description: Enable debug logging
+    required: false
+    default: 'false'
+  github_token:
+    description: GitHub token for posting PR comments (optional)
+    required: false
+outputs:
+  jobNames:
+    description: List of job names from the API response
+  workflowPath:
+    description: Path to the workflow file
+  content:
+    description: Workflow content (only when debug is true)
+  skip:
+    description: JSON object containing skip flags for each step
+runs:
+  using: node20
+  main: dist/index.js 
