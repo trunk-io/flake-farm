@@ -10,12 +10,16 @@ with intent to flake.
 
 ### Demonstrated testing frameworks
 
-| Language   | Framework              |
-| ---------- | ---------------------- |
-| python     | pytest, robotframework |
-| javascript | mocha, jasmine, jest   |
-
-<br/>
+| Language   | Frameworks                           | Workflow                                                                                                                                             |
+| ---------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| python     | pytest, robotframework, behave       | [.github/workflows/python-tests.yaml](.github/workflows/python-tests.yaml), [.github/workflows/retry-tests.yaml](.github/workflows/retry-tests.yaml) |
+| javascript | mocha, jasmine, jest, playwright     | [.github/workflows/javascript-tests.yaml](.github/workflows/javascript-tests.yaml)                                                                   |
+| java       | JUnit (Gradle/Maven), Playwright     | [.github/workflows/java-tests.yaml](.github/workflows/java-tests.yaml)                                                                               |
+| go         | go test (go-junit-report, gotestsum) | [.github/workflows/go.yaml](.github/workflows/go.yaml)                                                                                               |
+| php        | phpunit                              | [.github/workflows/php.yaml](.github/workflows/php.yaml)                                                                                             |
+| ruby       | rspec, minitest                      | [.github/workflows/ruby-tests.yaml](.github/workflows/ruby-tests.yaml)                                                                               |
+| rust       | nextest                              | [.github/workflows/rust-tests.yaml](.github/workflows/rust-tests.yaml)                                                                               |
+| bazel      | gtest                                | [.github/workflows/bazel.yaml](.github/workflows/bazel.yaml)                                                                                         |
 
 ### Mission
 
