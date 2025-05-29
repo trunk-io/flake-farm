@@ -28,6 +28,8 @@ lint:
     - golangci-lint2@2.1.6
     - ktlint@1.6.0
     - eslint@9.27.0
+  disabeld:
+    - rubocop
   ignore:
     - linters: [ALL]
       paths:
