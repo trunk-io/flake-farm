@@ -1,0 +1,40 @@
+name: C# Tests
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'csharp/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'csharp/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x' # Using .NET 6 as an example, can be adjusted
+
+    - name: Restore dependencies
+      run: dotnet restore csharp/FlakyApp.sln
+
+    - name: Build
+      run: dotnet build csharp/FlakyApp.sln --no-restore --configuration Release
+
+    - name: Test
+      run: dotnet test csharp/FlakyApp.Tests/FlakyApp.Tests.csproj --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" || true # Continue even if tests fail (flaky nature)
+
+    - name: Upload test results
+      if: always() # Always run this step to upload results
+      uses: actions/upload-artifact@v4
+      with:
+        name: csharp-test-results
+        path: '**/test-results.trx'

@@ -85,3 +85,7 @@ go/src/counter_test.txt
 
 .venv
 python/behave/retry.data
+
+# C# / .NET
+[Bb]in/
+[Oo]bj/
