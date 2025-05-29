@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "dgSpecHash": "zZnNy/maGIXXKwguNPBr381dCMg6YWrDTjOQzLkGrGQoMmJ0jzAgzmtM9432fSRNVWUQpoqZfdeOhFOwu1yi8A==",
+  "success": true,
+  "projectFilePath": "/app/csharp/FlakyMSTests/FlakyMSTests.csproj",
+  "expectedPackageFiles": [
+    "/home/swebot/.nuget/packages/coverlet.collector/6.0.0/coverlet.collector.6.0.0.nupkg.sha512",
+    "/home/swebot/.nuget/packages/junitxml.testlogger/6.1.0/junitxml.testlogger.6.1.0.nupkg.sha512",
+    "/home/swebot/.nuget/packages/microsoft.codecoverage/17.6.0/microsoft.codecoverage.17.6.0.nupkg.sha512",
+    "/home/swebot/.nuget/packages/microsoft.net.test.sdk/17.6.0/microsoft.net.test.sdk.17.6.0.nupkg.sha512",
+    "/home/swebot/.nuget/packages/microsoft.testplatform.objectmodel/17.6.0/microsoft.testplatform.objectmodel.17.6.0.nupkg.sha512",
+    "/home/swebot/.nuget/packages/microsoft.testplatform.testhost/17.6.0/microsoft.testplatform.testhost.17.6.0.nupkg.sha512",
+    "/home/swebot/.nuget/packages/mstest.testadapter/3.0.4/mstest.testadapter.3.0.4.nupkg.sha512",
+    "/home/swebot/.nuget/packages/mstest.testframework/3.0.4/mstest.testframework.3.0.4.nupkg.sha512",
+    "/home/swebot/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512",
+    "/home/swebot/.nuget/packages/nuget.frameworks/5.11.0/nuget.frameworks.5.11.0.nupkg.sha512",
+    "/home/swebot/.nuget/packages/system.reflection.metadata/1.6.0/system.reflection.metadata.1.6.0.nupkg.sha512"
+  ],
+  "logs": []
+}
