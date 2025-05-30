@@ -18,18 +18,15 @@ jobs:
         uses: bazelbuild/setup-bazelisk@v3
 
       - name: Run tests
-        run: bazel test //bazel/gtest:hello_test
+        run: bazel test //bazel/gtest:hello_test --build_event_json_file=build_events.json
         continue-on-error: true
 
       - name: Upload results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
-        with:
-          # Path to your test results.
-          junit-paths: "bazel-testlogs/**/test.xml"
-          # Provide your Trunk organization slug.
-          org-slug: trunk
-          # Provide your Trunk API token as a GitHub secret.
-          token: ${{ secrets.TRUNK_TOKEN }}
         continue-on-error: true
+        with:
+          bazel-bep-path: build_events.json
+          org-slug: trunk
+          token: ${{ secrets.TRUNK_TOKEN }}

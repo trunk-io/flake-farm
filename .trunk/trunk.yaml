@@ -64,5 +64,6 @@ tools:
     - node
     - python
   enabled:
+    - bazel@8.2.1
     - gh@2.74.0
     - pnpm@10.11.0
