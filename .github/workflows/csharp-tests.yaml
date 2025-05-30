@@ -38,7 +38,7 @@ jobs:
       with:
         # Path to your test results.
         # This path should match the LogFilePath used in the dotnet test command.
-        junit-paths: "test-results/csharp-junit.xml"
+        junit-paths: "**/csharp-junit.xml"
         # Provide your Trunk organization slug.
         org-slug: trunk
         # Provide your Trunk API token as a GitHub secret.
