@@ -64,4 +64,5 @@ tools:
     - node
     - python
   enabled:
+    - gh@2.74.0
     - pnpm@10.11.0
