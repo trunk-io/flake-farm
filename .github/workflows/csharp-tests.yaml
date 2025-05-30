@@ -30,7 +30,7 @@ jobs:
       run: dotnet build csharp/ItsAlwaysSunnyOnEarth.sln --no-restore --configuration Release
 
     - name: Test
-      run: dotnet test csharp/ItsAlwaysSunnyOnEarth.Tests/ItsAlwaysSunnyOnEarth.Tests.csproj --no-build --configuration Release --logger "junit;LogFilePath=../../../../test-results/csharp-junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+      run: dotnet test csharp/ItsAlwaysSunnyOnEarth.Tests/ItsAlwaysSunnyOnEarth.Tests.csproj --no-build --configuration Release --logger "junit;LogFilePath=test-results/csharp-junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
 
     - name: Upload results to Trunk
       if: ${{ always() }}
