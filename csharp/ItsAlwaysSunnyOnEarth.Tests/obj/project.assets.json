@@ -8,6 +8,12 @@
           "build/netstandard1.0/coverlet.collector.targets": {}
         }
       },
+      "JunitXml.TestLogger/6.1.0": {
+        "type": "package",
+        "build": {
+          "build/netstandard2.0/JUnitXml.TestLogger.props": {}
+        }
+      },
       "Microsoft.CodeCoverage/17.6.0": {
         "type": "package",
         "compile": {
@@ -1712,6 +1718,16 @@
         "build": {
           "build/netcoreapp3.1/xunit.runner.visualstudio.props": {}
         }
+      },
+      "ItsAlwaysSunnyOnEarth/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/ItsAlwaysSunnyOnEarth.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ItsAlwaysSunnyOnEarth.dll": {}
+        }
       }
     }
   },
@@ -1767,6 +1783,23 @@
         "coverlet-icon.png",
         "coverlet.collector.6.0.0.nupkg.sha512",
         "coverlet.collector.nuspec"
+      ]
+    },
+    "JunitXml.TestLogger/6.1.0": {
+      "sha512": "a3ciawoHOzqcry7yS5z9DerNyF9QZi6fEZZJPILSy6Noj6+r8Ydma+cENA6wvivXDCblpXxw72wWT9QApNy/0w==",
+      "type": "package",
+      "path": "junitxml.testlogger/6.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/_common/Microsoft.VisualStudio.TestPlatform.Extension.JUnit.Xml.TestLogger.dll",
+        "build/_common/Spekt.TestLogger.dll",
+        "build/netstandard2.0/JUnitXml.TestLogger.props",
+        "docs/CHANGELOG.md",
+        "docs/README.md",
+        "junitxml.testlogger.6.1.0.nupkg.sha512",
+        "junitxml.testlogger.nuspec",
+        "packageIcon.png"
       ]
     },
     "Microsoft.CodeCoverage/17.6.0": {
@@ -5507,10 +5540,17 @@
         "xunit.runner.visualstudio.2.4.5.nupkg.sha512",
         "xunit.runner.visualstudio.nuspec"
       ]
+    },
+    "ItsAlwaysSunnyOnEarth/1.0.0": {
+      "type": "project",
+      "path": "../ItsAlwaysSunnyOnEarth/ItsAlwaysSunnyOnEarth.csproj",
+      "msbuildProject": "../ItsAlwaysSunnyOnEarth/ItsAlwaysSunnyOnEarth.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "ItsAlwaysSunnyOnEarth >= 1.0.0",
+      "JunitXml.TestLogger >= 6.1.0",
       "Microsoft.NET.Test.Sdk >= 17.6.0",
       "coverlet.collector >= 6.0.0",
       "xunit >= 2.4.2",
@@ -5541,7 +5581,11 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "/app/csharp/ItsAlwaysSunnyOnEarth/ItsAlwaysSunnyOnEarth.csproj": {
+              "projectPath": "/app/csharp/ItsAlwaysSunnyOnEarth/ItsAlwaysSunnyOnEarth.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -5554,6 +5598,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "JunitXml.TestLogger": {
+            "target": "Package",
+            "version": "[6.1.0, )"
+          },
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
             "version": "[17.6.0, )"

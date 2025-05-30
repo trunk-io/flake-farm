@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "DwTsZTaQVEkHIeIfp0dGS9bmKpVzmlHtKoXBP7qS2PTaw1WQbNRKW5nBwqbet7Or4BWWL/N1/tEQDFmjJC5f6Q==",
+  "dgSpecHash": "H+yj3O/mRXuzw7bAy8IuuI/OGG3QtReuXjFGzuUrnz+cS7eORWgxDU/Y2LfImlxeIFaNXfTixAHT2+W+6r4+ew==",
   "success": true,
   "projectFilePath": "/app/csharp/ItsAlwaysSunnyOnEarth.Tests/ItsAlwaysSunnyOnEarth.Tests.csproj",
   "expectedPackageFiles": [
     "/home/swebot/.nuget/packages/coverlet.collector/6.0.0/coverlet.collector.6.0.0.nupkg.sha512",
+    "/home/swebot/.nuget/packages/junitxml.testlogger/6.1.0/junitxml.testlogger.6.1.0.nupkg.sha512",
     "/home/swebot/.nuget/packages/microsoft.codecoverage/17.6.0/microsoft.codecoverage.17.6.0.nupkg.sha512",
     "/home/swebot/.nuget/packages/microsoft.net.test.sdk/17.6.0/microsoft.net.test.sdk.17.6.0.nupkg.sha512",
     "/home/swebot/.nuget/packages/microsoft.netcore.platforms/1.1.0/microsoft.netcore.platforms.1.1.0.nupkg.sha512",

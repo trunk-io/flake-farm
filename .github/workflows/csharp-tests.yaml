@@ -30,11 +30,24 @@ jobs:
       run: dotnet build csharp/ItsAlwaysSunnyOnEarth.sln --no-restore --configuration Release
 
     - name: Test
-      run: dotnet test csharp/ItsAlwaysSunnyOnEarth.Tests/ItsAlwaysSunnyOnEarth.Tests.csproj --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" || true # Continue even if tests fail (flaky nature)
+      run: dotnet test csharp/ItsAlwaysSunnyOnEarth.Tests/ItsAlwaysSunnyOnEarth.Tests.csproj --no-build --configuration Release --logger "junit;LogFilePath=../../../../test-results/csharp-junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+
+    - name: Upload results to Trunk
+      if: ${{ always() }}
+      uses: trunk-io/analytics-uploader@main
+      with:
+        # Path to your test results.
+        # This path should match the LogFilePath used in the dotnet test command.
+        junit-paths: "test-results/csharp-junit.xml"
+        # Provide your Trunk organization slug.
+        org-slug: trunk
+        # Provide your Trunk API token as a GitHub secret.
+        token: ${{ secrets.TRUNK_TOKEN }}
+      continue-on-error: true
 
     - name: Upload test results
       if: always() # Always run this step to upload results
       uses: actions/upload-artifact@v4
       with:
         name: csharp-test-results
-        path: '**/test-results.trx'
+        path: 'test-results/csharp-junit.xml'
