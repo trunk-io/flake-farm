@@ -1,0 +1,14 @@
+# Ignore build outputs and user-specific files
+**/bin/
+**/obj/
+# Rider and VS settings
+.vs/
+*.user
+*.rsuser
+*.suo
+# Build logs and caches
+*.log
+*.cache
+*.mdb
+*.pdb
+TestResults/

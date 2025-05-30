@@ -2,39 +2,42 @@ name: C# Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'csharp/**'
+      - csharp/**
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'csharp/**'
+      - csharp/**
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x' # Updated to .NET 8
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x # Updated to .NET 8
 
-    - name: Restore dependencies
-      run: dotnet restore csharp/ItsAlwaysSunnyOnEarth.sln
+      - name: Restore dependencies
+        run: dotnet restore csharp/ItsAlwaysSunnyOnEarth.sln
 
-    - name: Build
-      run: dotnet build csharp/ItsAlwaysSunnyOnEarth.sln --no-restore --configuration Release
+      - name: Build
+        run: dotnet build csharp/ItsAlwaysSunnyOnEarth.sln --no-restore --configuration Release
 
-    - name: Test
-      run: dotnet test csharp/ItsAlwaysSunnyOnEarth.Tests/ItsAlwaysSunnyOnEarth.Tests.csproj --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" || true # Continue even if tests fail (flaky nature)
+      - name: Test
+        run: dotnet test csharp/ItsAlwaysSunnyOnEarth.Tests/ItsAlwaysSunnyOnEarth.Tests.csproj --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" || true # Continue even if tests fail (flaky nature)
 
-    - name: Upload test results
-      if: always() # Always run this step to upload results
-      uses: actions/upload-artifact@v4
-      with:
-        name: csharp-test-results
-        path: '**/test-results.trx'
+      - name: Upload test results
+        if: always() # Always run this step to upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: csharp-test-results
+          path: "**/test-results.trx"
