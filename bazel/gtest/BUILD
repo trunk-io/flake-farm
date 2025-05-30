@@ -1,16 +1,21 @@
-load("@rules_cc//cc:defs.bzl", "cc_test")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
-cc_test(
-    name = "lottery_test",
-    size = "small",
-    srcs = [
-        "lottery_test.cc",
-        "lottery.h",
+cc_library(
+    name = "stock_data",
+    srcs = ["src/stock_data.cpp"],
+    hdrs = [
+        "include/stock_data.h",
+        "config.h",
     ],
+    includes = ["include"],
     deps = [
-        "@googletest//:gtest",
-        "@googletest//:gtest_main",
         "@curl//:curl",
-        "@nlohmann_json//:json",
+        "@rapidjson//:rapidjson",
     ],
-)
+    visibility = ["//visibility:public"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ],
+) 
