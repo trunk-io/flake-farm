@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FlakyApp\FlakyApp.csproj" />
+    <ProjectReference Include="..\ItsAlwaysSunnyOnEarth\ItsAlwaysSunnyOnEarth.csproj" />
   </ItemGroup>
 
 </Project>
