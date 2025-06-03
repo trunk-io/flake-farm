@@ -27,7 +27,7 @@ jobs:
         uses: trunk-io/analytics-uploader@main
         continue-on-error: true
         with:
-          cli-version: v0.10.0-beta.2
+          cli-version: 0.10.0-beta.3
           bazel-bep-path: build_events.json
           org-slug: trunk
           token: ${{ secrets.TRUNK_TOKEN }}
