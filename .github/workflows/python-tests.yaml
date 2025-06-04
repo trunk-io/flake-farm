@@ -38,6 +38,7 @@ jobs:
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
         with:
+          cli-version: 0.10.0-beta.3
           # Path to your test results.
           junit-paths: "**/*_test.xml"
           # Provide your Trunk organization slug.
