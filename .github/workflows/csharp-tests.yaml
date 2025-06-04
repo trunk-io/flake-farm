@@ -36,7 +36,7 @@ jobs:
       if: ${{ always() }}
       uses: trunk-io/analytics-uploader@main
       with:
-        cli-version: v0.10.0-beta.2
+        cli-version: 0.10.0-beta.3
         # Path to your test results.
         # This path should match the LogFilePath used in the dotnet test command.
         junit-paths: "**/csharp-junit.xml"

@@ -47,7 +47,7 @@ jobs:
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
         with:
-          cli-version: v0.10.0-beta.2
+          cli-version: 0.10.0-beta.3
           # Path to your test results.
           junit-paths: "**/python/results/*-behave.xml"
           # Provide your Trunk organization slug.
