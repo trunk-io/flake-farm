@@ -25,13 +25,13 @@ jobs:
         run: |
           pnpm install
           sudo npx playwright install-deps          
-          npx playwright install 
+          npx playwright install
 
       - name: Run Mocha Tests
         if: ${{ always() }}
         run: |
           npm run mocha-test || true
-          cat javascript/tests/mocha/mocha_test.xml          
+          cat javascript/tests/mocha/mocha_test.xml
 
       - name: Run Jest Tests
         if: ${{ always() }}
