@@ -7,12 +7,12 @@ on:
 
 jobs:
   test:
-    runs-on: [ubuntu-latest]
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      # Note: libsodium-dev and libsodium23 must be pre-installed on the [ubuntu-latest] runner
+      # Note: libsodium-dev and libsodium23 must be pre-installed on the ubuntu-latest runner
       # These packages are required for PHP sodium extension
 
       - name: Setup PHP Action
