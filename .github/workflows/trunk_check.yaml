@@ -20,19 +20,6 @@ jobs:
       - name: Trunk Check
         uses: trunk-io/trunk-action@v1
         with:
-          # The version of Trunk CLI to use. Defaults to latest.
-          # trunk-version: "1.18.0"
-          # Arguments to pass to trunk check.
-          # By default, this is --ci --all --verbose.
-          # We recommend including --all to check all files, not just changed ones.
-          # check-arguments: --ci --all --verbose
-          # Whether to enable caching. Defaults to true.
-          # cache: true
-          # Your Trunk organization slug. Required if you want to upload results to Trunk Merge.
-          # org-slug: your-org-slug
-          # The Trunk API token. Required if you want to upload results to Trunk Merge.
-          # Should be set as a repository secret.
-          token: ${{ secrets.TRUNK_TOKEN }}
-          # GitHub token for commit status and PR comments.
-          # Defaults to github.token.
-          # github-token: ${{ github.token }}
+          cache: false
+          timeout-seconds: 1500 # 25 minutes in seconds
+          cat-trunk-debug-logs: true          
