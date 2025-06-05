@@ -5,6 +5,7 @@ const Animal = {
 
 class Season {
   getCurrent() {
+    const unusedVariable = "This will trigger a linting error";
     return Animal.Rabbit;
   }
 }
