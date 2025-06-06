@@ -23,4 +23,5 @@ jobs:
           cache: false
           timeout-seconds: 1500 # 25 minutes in seconds
           cat-trunk-debug-logs: true
+          github-token: ${{ github.token }}
           debug: true
