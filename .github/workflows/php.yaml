@@ -16,7 +16,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y libsodium-dev libsodium23
-          
+
       - name: Setup PHP Action
         uses: shivammathur/setup-php@2.31.1
         with:
