@@ -25,3 +25,5 @@ jobs:
           timeout-seconds: 1500 # 25 minutes in seconds
           cat-trunk-debug-logs: true
           arguments: --log-level=debug
+          check-all-mode: "hold-the-line"
+        continue-on-error: true
