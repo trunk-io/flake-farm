@@ -24,4 +24,4 @@ jobs:
           cache: false
           timeout-seconds: 1500 # 25 minutes in seconds
           cat-trunk-debug-logs: true
-          # arguments: --log-level=debug
+          arguments: --log-level=debug
