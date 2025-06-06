@@ -65,8 +65,7 @@ jobs:
           retention-days: 5
 
       - name: trigger job re-run
-        if:
-          ${{ failure() && steps.test.conclusion == 'failure' && fromJSON(github.run_attempt) < 5}}
+        if: ${{ failure() && steps.test.conclusion == 'failure' && fromJSON(github.run_attempt) < 5}}
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
