@@ -12,9 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Note: libsodium-dev and libsodium23 must be pre-installed on the ubuntu-latest runner
-      # These packages are required for PHP sodium extension
-
+      - name: Install lib sodium
+        run: |
+          sudo apt update
+          sudo apt install -y libsodium-dev libsodium23
+          
       - name: Setup PHP Action
         uses: shivammathur/setup-php@2.31.1
         with:
