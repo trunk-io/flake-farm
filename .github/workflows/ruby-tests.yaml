@@ -3,7 +3,11 @@ name: Ruby Tests
 on:
   schedule:
     - cron: 0 */6 * * *
-  pull_request: {}
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   test:
