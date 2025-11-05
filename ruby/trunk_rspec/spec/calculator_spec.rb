@@ -1,7 +1,7 @@
 # spec/calculator_spec.rb
 # spec_helper is automatically loaded via .rspec file
 require 'ostruct'
-require_relative "../lib/trunk_calculator"
+require_relative "../lib/calculator"
 
 describe TrunkCalculator do
   describe ".add" do
