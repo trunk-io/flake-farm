@@ -17,8 +17,9 @@ runtimes:
   enabled:
     - go@1.21.0
     - java@13.0.11
-    - node@22.16.0
+    - node@=22.16.0
     - python@3.10.8
+    - ruby@>=3.4.7
 
 lint:
   enabled:
@@ -61,7 +62,7 @@ actions:
 
 tools:
   runtimes:
-    - node
+    # - node
     - python
   enabled:
     - bazel@8.2.1

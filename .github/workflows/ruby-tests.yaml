@@ -15,12 +15,17 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.1.2
+          ruby-version: 3.4.7
           bundler-cache: true
 
       - name: Run rspec tests
         if: ${{ always() }}
         run: bundle exec rspec ruby/rspec --format RspecJunitFormatter --out rspec_test.xml
+
+      - name: Run rspec tests (with trunk rspec plugin)
+        if: ${{ always() }}
+        working-directory: ruby/trunk_rspec
+        run: bundle exec rspec
 
       - name: Run minitest tests
         if: ${{ always() }}
