@@ -28,7 +28,7 @@ jobs:
         env:
           TRUNK_ORG_URL_SLUG: trunk
           TRUNK_TOKEN: ${{ secrets.TRUNK_TOKEN }}
-        run: bundle exec rspec
+        run: TRUNK_ORG_URL_SLUG=trunk bundle exec rspec
 
       - name: Run minitest tests
         if: ${{ always() }}
