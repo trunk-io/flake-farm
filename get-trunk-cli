@@ -7,36 +7,41 @@ set -euo pipefail
 REPO="trunk-io/analytics-cli"
 
 # Normalize OS/arch to match launcher script platform naming
-OS="$(uname -s | tr '[:upper:]' '[:lower:]')"   # linux | darwin
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')" # linux | darwin
 ARCH="$(uname -m)"
 
 # Map to platform names used by trunk-analytics-cli releases
-if [[ "$OS" == "darwin" ]]; then
-  case "$ARCH" in
-    arm64|aarch64) PLATFORM="aarch64-apple-darwin" ;;
-    x86_64) PLATFORM="x86_64-apple-darwin" ;;
-    *) echo "Unsupported macOS architecture: $ARCH" >&2; exit 1 ;;
-  esac
-elif [[ "$OS" == "linux" ]]; then
-  case "$ARCH" in
-    aarch64|arm64) PLATFORM="aarch64-unknown-linux" ;;
-    x86_64) PLATFORM="x86_64-unknown-linux" ;;
-    *) echo "Unsupported Linux architecture: $ARCH" >&2; exit 1 ;;
-  esac
+if [[ ${OS} == "darwin" ]]; then
+	case "${ARCH}" in
+	arm64 | aarch64) PLATFORM="aarch64-apple-darwin" ;;
+	x86_64) PLATFORM="x86_64-apple-darwin" ;;
+	*)
+		echo "Unsupported macOS architecture: ${ARCH}" >&2
+		exit 1
+		;;
+	esac
+elif [[ ${OS} == "linux" ]]; then
+	case "${ARCH}" in
+	aarch64 | arm64) PLATFORM="aarch64-unknown-linux" ;;
+	x86_64) PLATFORM="x86_64-unknown-linux" ;;
+	*)
+		echo "Unsupported Linux architecture: ${ARCH}" >&2
+		exit 1
+		;;
+	esac
 else
-  echo "Unsupported OS: $OS" >&2
-  exit 1
+	echo "Unsupported OS: ${OS}" >&2
+	exit 1
 fi
 
 ASSET="trunk-analytics-cli-${PLATFORM}.tar.gz"
 URL="https://github.com/${REPO}/releases/latest/download/${ASSET}"
 
 echo "Downloading and installing ${ASSET}…"
-curl -fL --retry 3 "$URL" | tar -xz
+curl -fL --retry 3 "${URL}" | tar -xz
 
 # Tarball contains a single file named trunk-analytics-cli
 chmod +x trunk-analytics-cli
 
 echo "Installed to ./trunk-analytics-cli"
 ./trunk-analytics-cli --version
-
