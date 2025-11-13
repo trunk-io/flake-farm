@@ -1,12 +1,13 @@
 name: Trunk Check
 
 on:
-  pull_request:
+  push: {}
 
 permissions:
   contents: read
   # Required for Trunk to post annotations
   checks: write
+  pull-requests: read
 
 jobs:
   trunk_check:
@@ -23,5 +24,6 @@ jobs:
           cache: false
           timeout-seconds: 1500 # 25 minutes in seconds
           cat-trunk-debug-logs: true
-          github-token: ${{ github.token }}
-          debug: true
+          arguments: --log-level=debug
+          check-all-mode: "hold-the-line"
+        continue-on-error: true

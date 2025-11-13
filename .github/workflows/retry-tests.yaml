@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: set up python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.x
 
@@ -65,8 +65,7 @@ jobs:
           retention-days: 5
 
       - name: trigger job re-run
-        if:
-          ${{ failure() && steps.test.conclusion == 'failure' && fromJSON(github.run_attempt) < 5}}
+        if: ${{ failure() && steps.test.conclusion == 'failure' && fromJSON(github.run_attempt) < 5}}
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
