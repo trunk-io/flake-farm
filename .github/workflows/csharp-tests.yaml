@@ -29,7 +29,7 @@ jobs:
 
       - name: Upload results to Trunk
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@85b852d24db94b3b48d7b73ef45b2d1de98d592c
+        uses: trunk-io/analytics-uploader@main
         with:
           cli-version: 0.12.0-beta.0
           # Path to your test results.
