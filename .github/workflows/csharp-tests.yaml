@@ -10,40 +10,40 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 10.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
 
-    - name: Restore dependencies
-      run: dotnet restore csharp/ItsAlwaysSunnyOnEarth.sln
-      
-    - name: Build
-      run: dotnet build csharp/ItsAlwaysSunnyOnEarth.sln --no-restore --configuration Release
+      - name: Restore dependencies
+        run: dotnet restore csharp/ItsAlwaysSunnyOnEarth.sln
 
-    - name: Test
-      run: dotnet test csharp/ItsAlwaysSunnyOnEarth.Tests/ItsAlwaysSunnyOnEarth.Tests.csproj --no-build --configuration Release --logger "junit;LogFilePath=test-results/csharp-junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+      - name: Build
+        run: dotnet build csharp/ItsAlwaysSunnyOnEarth.sln --no-restore --configuration Release
 
-    - name: Upload results to Trunk
-      if: ${{ always() }}
-      uses: trunk-io/analytics-uploader@85b852d24db94b3b48d7b73ef45b2d1de98d592c
-      with:
-        cli-version: 0.12.0-beta.0
-        # Path to your test results.
-        # This path should match the LogFilePath used in the dotnet test command.
-        junit-paths: "csharp/**/test-results/csharp-junit.xml"
-        # Provide your Trunk organization slug.
-        org-slug: trunk
-        # Provide your Trunk API token as a GitHub secret.
-        token: ${{ secrets.TRUNK_TOKEN }}
-      continue-on-error: true
+      - name: Test
+        run: dotnet test csharp/ItsAlwaysSunnyOnEarth.Tests/ItsAlwaysSunnyOnEarth.Tests.csproj --no-build --configuration Release --logger "junit;LogFilePath=test-results/csharp-junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
 
-    - name: Upload test results
-      if: always() # Always run this step to upload results
-      uses: actions/upload-artifact@v4
-      with:
-        name: csharp-test-results
-        path: csharp/**/test-results/csharp-junit.xml
+      - name: Upload results to Trunk
+        if: ${{ always() }}
+        uses: trunk-io/analytics-uploader@85b852d24db94b3b48d7b73ef45b2d1de98d592c
+        with:
+          cli-version: 0.12.0-beta.0
+          # Path to your test results.
+          # This path should match the LogFilePath used in the dotnet test command.
+          junit-paths: csharp/**/test-results/csharp-junit.xml
+          # Provide your Trunk organization slug.
+          org-slug: trunk
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_TOKEN }}
+        continue-on-error: true
+
+      - name: Upload test results
+        if: always() # Always run this step to upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: csharp-test-results
+          path: csharp/**/test-results/csharp-junit.xml
