@@ -1,14 +1,9 @@
 name: C# Tests
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'csharp/**'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'csharp/**'
+  schedule:
+    - cron: 0 */6 * * *
+  pull_request: {}
 
 jobs:
   build:
