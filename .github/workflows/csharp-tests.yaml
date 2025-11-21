@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout code
@@ -21,11 +21,10 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x' # Updated to .NET 8
+        dotnet-version: 8.0.x
 
     - name: Restore dependencies
       run: dotnet restore csharp/ItsAlwaysSunnyOnEarth.sln
-
     - name: Build
       run: dotnet build csharp/ItsAlwaysSunnyOnEarth.sln --no-restore --configuration Release
 
@@ -34,9 +33,9 @@ jobs:
 
     - name: Upload results to Trunk
       if: ${{ always() }}
-      uses: trunk-io/analytics-uploader@main
+      uses: trunk-io/analytics-uploader@85b852d24db94b3b48d7b73ef45b2d1de98d592c
       with:
-        cli-version: 0.10.0-beta.3
+        cli-version: 0.12.0-beta.0
         # Path to your test results.
         # This path should match the LogFilePath used in the dotnet test command.
         junit-paths: "**/csharp-junit.xml"
@@ -51,4 +50,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: csharp-test-results
-        path: 'test-results/csharp-junit.xml'
+        path: test-results/csharp-junit.xml
