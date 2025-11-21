@@ -16,10 +16,11 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 10.0.x
 
     - name: Restore dependencies
       run: dotnet restore csharp/ItsAlwaysSunnyOnEarth.sln
+      
     - name: Build
       run: dotnet build csharp/ItsAlwaysSunnyOnEarth.sln --no-restore --configuration Release
 
@@ -33,7 +34,7 @@ jobs:
         cli-version: 0.12.0-beta.0
         # Path to your test results.
         # This path should match the LogFilePath used in the dotnet test command.
-        junit-paths: "**/csharp-junit.xml"
+        junit-paths: "csharp/**/test-results/csharp-junit.xml"
         # Provide your Trunk organization slug.
         org-slug: trunk
         # Provide your Trunk API token as a GitHub secret.
@@ -45,4 +46,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: csharp-test-results
-        path: test-results/csharp-junit.xml
+        path: csharp/**/test-results/csharp-junit.xml
