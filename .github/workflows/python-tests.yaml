@@ -7,15 +7,22 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            variant: linux
+          - os: macos-latest
+            variant: macOS
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: 3.x
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -44,4 +51,6 @@ jobs:
           org-slug: trunk
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
+          # Variant to distinguish between OS platforms
+          variant: ${{ matrix.variant }}
         continue-on-error: true
