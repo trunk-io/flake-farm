@@ -6,7 +6,7 @@ on:
   pull_request: {}
 
 jobs:
-  test:
+  python_test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -55,3 +55,13 @@ jobs:
           # Variant to distinguish between OS platforms
           variant: ${{ matrix.variant }}
         continue-on-error: true
+
+      - name: Upload JUnit XML artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-junit-results-${{ matrix.variant }}
+          path: |
+            python/results/**/*_test.xml
+            python/**/*_test.xml
+          retention-days: 7

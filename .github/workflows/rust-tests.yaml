@@ -6,7 +6,7 @@ on:
   pull_request: {}
 
 jobs:
-  test:
+  rust_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,9 +31,17 @@ jobs:
         uses: trunk-io/analytics-uploader@main
         with:
           # Path to your test results.
-          junit-paths: "rust/**/nextest/ci/*junit.xml"
+          junit-paths: rust/**/nextest/ci/*junit.xml
           # Provide your Trunk organization slug.
           org-slug: trunk
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
         continue-on-error: true
+
+      - name: Upload JUnit XML artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-junit-results
+          path: rust/**/nextest/ci/*junit.xml
+          retention-days: 7

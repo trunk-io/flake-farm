@@ -6,7 +6,7 @@ on:
   pull_request: {}
 
 jobs:
-  test:
+  javascript_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -57,3 +57,14 @@ jobs:
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
         continue-on-error: true
+
+      - name: Upload JUnit XML artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: javascript-junit-results
+          path: |
+            **/*_test.xml
+            **/junitresults-*.xml
+            **/mocha_test.xml
+          retention-days: 7

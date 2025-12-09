@@ -8,7 +8,7 @@ on:
   pull_request: {}
 
 jobs:
-  test:
+  bazel_test:
     runs-on: ubuntu-latest
 
     steps:
