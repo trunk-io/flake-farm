@@ -6,16 +6,24 @@ on:
   pull_request: {}
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  python_test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            variant: linux
+          - os: macos-latest
+            variant: macOS
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: 3.x
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -44,4 +52,16 @@ jobs:
           org-slug: trunk
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
+          # Variant to distinguish between OS platforms
+          variant: ${{ matrix.variant }}
         continue-on-error: true
+
+      - name: Upload JUnit XML artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-junit-results-${{ matrix.variant }}
+          path: |
+            python/results/**/*_test.xml
+            python/**/*_test.xml
+          retention-days: 7

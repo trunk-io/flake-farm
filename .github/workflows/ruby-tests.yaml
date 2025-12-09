@@ -6,7 +6,7 @@ on:
   pull_request: {}
 
 jobs:
-  test:
+  ruby_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -46,3 +46,13 @@ jobs:
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
         continue-on-error: true
+
+      - name: Upload JUnit XML artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ruby-junit-results
+          path: |
+            **/rspec_test.xml
+            **/ruby/minitest/results/*.xml
+          retention-days: 7
