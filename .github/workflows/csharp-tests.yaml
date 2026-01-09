@@ -29,7 +29,7 @@ jobs:
 
       - name: Upload results to Trunk
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@main
+        uses: trunk-io/analytics-uploader@dylan/refactor-to-use-release-artifacts-directly
         with:
           cli-version: 0.12.0-beta.0
           # Path to your test results.
