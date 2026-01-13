@@ -45,7 +45,7 @@ jobs:
       - name: Upload results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@dylan/refactor-to-use-release-artifacts-directly
+        uses: trunk-io/analytics-uploader@main
         with:
           # Path to your test results.
           junit-paths: "**/python/results/*-behave.xml"
