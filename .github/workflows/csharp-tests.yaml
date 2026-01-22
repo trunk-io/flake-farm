@@ -30,13 +30,14 @@ jobs:
       - name: Upload results to Trunk
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
-          cli-version: 0.12.0-beta.0
           # Path to your test results.
           # This path should match the LogFilePath used in the dotnet test command.
           junit-paths: csharp/**/test-results/csharp-junit.xml
           # Provide your Trunk organization slug.
-          org-slug: trunk
+          org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
         continue-on-error: true

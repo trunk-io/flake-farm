@@ -25,8 +25,10 @@ jobs:
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         continue-on-error: true
         with:
           bazel-bep-path: build_events.json
-          org-slug: trunk
+          org-slug: ${{ vars.ORG_SLUG }}
           token: ${{ secrets.TRUNK_TOKEN }}

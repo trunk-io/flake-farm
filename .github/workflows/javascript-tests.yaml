@@ -25,13 +25,13 @@ jobs:
         run: |
           pnpm install
           sudo npx playwright install-deps          
-          npx playwright install 
+          npx playwright install
 
       - name: Run Mocha Tests
         if: ${{ always() }}
         run: |
           npm run mocha-test || true
-          cat javascript/tests/mocha/mocha_test.xml          
+          cat javascript/tests/mocha/mocha_test.xml
 
       - name: Run Jest Tests
         if: ${{ always() }}
@@ -49,11 +49,13 @@ jobs:
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
           # Path to your test results.
           junit-paths: "**/*_test.xml,**/junitresults-*.xml,**/mocha_test.xml"
           # Provide your Trunk organization slug.
-          org-slug: trunk
+          org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
         continue-on-error: true
