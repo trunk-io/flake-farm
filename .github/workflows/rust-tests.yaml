@@ -22,10 +22,12 @@ jobs:
         run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
       - name: Run rust tests
+        id: run_tests
         if: ${{ always() }}
         run: cargo nextest run --profile=ci --manifest-path=./rust/Cargo.toml
+        continue-on-error: true
 
-      - name: Upload results
+      - name: Process test results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
@@ -38,7 +40,9 @@ jobs:
           org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
-        continue-on-error: true
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.run_tests.outcome }}
+
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
