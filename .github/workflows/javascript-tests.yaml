@@ -28,24 +28,46 @@ jobs:
           npx playwright install
 
       - name: Run Mocha Tests
-        if: ${{ always() }}
+        id: mocha_tests
         run: |
           npm run mocha-test || true
           cat javascript/tests/mocha/mocha_test.xml
+        continue-on-error: true
 
       - name: Run Jest Tests
-        if: ${{ always() }}
+        id: jest_tests
         run: npm run jest-test
+        continue-on-error: true
 
       - name: Run Jasmine Tests
-        if: ${{ always() }}
+        id: jasmine_tests
         run: npm run jasmine-test
+        continue-on-error: true
 
       - name: Run Playwright Tests
         id: run_tests
-        if: ${{ always() }}
         run: npm run playwright-test
         continue-on-error: true
+
+      - name: Combine test outcomes
+        id: combine_outcomes
+        if: ${{ always() }}
+        run: |
+          # Check all test step outcomes
+          MOCHA_OUTCOME="${{ steps.mocha_tests.outcome }}"
+          JEST_OUTCOME="${{ steps.jest_tests.outcome }}"
+          JASMINE_OUTCOME="${{ steps.jasmine_tests.outcome }}"
+          PLAYWRIGHT_OUTCOME="${{ steps.run_tests.outcome }}"
+
+          # If any test step failed, set combined outcome to failure
+          if [[ "$MOCHA_OUTCOME" == "failure" ]] || \
+             [[ "$JEST_OUTCOME" == "failure" ]] || \
+             [[ "$JASMINE_OUTCOME" == "failure" ]] || \
+             [[ "$PLAYWRIGHT_OUTCOME" == "failure" ]]; then
+            echo "combined_outcome=failure" >> $GITHUB_OUTPUT
+          else
+            echo "combined_outcome=success" >> $GITHUB_OUTPUT
+          fi
 
       - name: Process test results
         # Run this step even if the test step ahead fails
@@ -60,8 +82,8 @@ jobs:
           org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
-          # Pass the test outcome for quarantining support
-          previous-step-outcome: ${{ steps.run_tests.outcome }}
+          # Pass the combined test outcome for quarantining support
+          previous-step-outcome: ${{ steps.combine_outcomes.outputs.combined_outcome }}
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
