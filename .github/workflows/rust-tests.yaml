@@ -43,7 +43,6 @@ jobs:
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.run_tests.outcome }}
 
-
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4

@@ -21,7 +21,7 @@ jobs:
       # this is the recommended way to run rspec tests using the trunk rspec plugin
       - name: Run rspec tests (with trunk rspec plugin)
         if: ${{ always() }}
-        
+
         working-directory: ruby/trunk_rspec
         env:
           TRUNK_ORG_URL_SLUG: ${{ vars.ORG_SLUG }}
@@ -32,8 +32,11 @@ jobs:
         if: ${{ always() }}
         run: bundle exec rspec ruby/rspec --format RspecJunitFormatter --out rspec_test.xml
       - name: Run minitest tests
+        id: run_tests
         if: ${{ always() }}
         run: bundle exec ruby ruby/minitest/mixer.rb
+        continue-on-error: true
+
       - name: Process test results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
@@ -47,7 +50,8 @@ jobs:
           org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
-        continue-on-error: true
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.run_tests.outcome }}
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}

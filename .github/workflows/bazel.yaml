@@ -21,14 +21,13 @@ jobs:
         run: bazel test //bazel/gtest:hello_test --build_event_json_file=build_events.json
         continue-on-error: true
 
-      - name: Upload results
+      - name: Process test results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
-        continue-on-error: true
         with:
-          bazel-bep-path: build_events.json
           org-slug: ${{ vars.ORG_SLUG }}
           token: ${{ secrets.TRUNK_TOKEN }}
+          previous-step-outcome: ${{ steps.run_tests.outcome }}

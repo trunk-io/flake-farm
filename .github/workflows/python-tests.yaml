@@ -36,12 +36,14 @@ jobs:
           junit_family=xunit1
 
       - name: Run robotframework tests
+        id: run_tests
         if: ${{ always() }}
         run:
           pabot --testlevelsplit --outputdir=python/results/robotframework --output=robot_test.xml
           python/robotframework/**
+        continue-on-error: true
 
-      - name: Upload results
+      - name: Process test results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
@@ -56,7 +58,8 @@ jobs:
           token: ${{ secrets.TRUNK_TOKEN }}
           # Variant to distinguish between OS platforms
           variant: ${{ matrix.variant }}
-        continue-on-error: true
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.run_tests.outcome }}
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
