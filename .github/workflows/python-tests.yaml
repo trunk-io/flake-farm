@@ -30,31 +30,56 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run pytest tests
+        id: pytest_tests
         if: ${{ always() }}
         run:
           pytest python/pytest/** --junitxml=python/results/pytest/pytest_test.xml -o
           junit_family=xunit1
+        continue-on-error: true
 
-      - name: Run robotframework tests
-        if: ${{ always() }}
-        run:
-          pabot --testlevelsplit --outputdir=python/results/robotframework --output=robot_test.xml
-          python/robotframework/**
-
-      - name: Upload results
+      - name: Process pytest results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
           # Path to your test results.
-          junit-paths: "**/*_test.xml"
+          junit-paths: python/results/pytest/pytest_test.xml
           # Provide your Trunk organization slug.
-          org-slug: trunk
+          org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
           # Variant to distinguish between OS platforms
           variant: ${{ matrix.variant }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.pytest_tests.outcome }}
+
+      - name: Run robotframework tests
+        id: robotframework_tests
+        if: ${{ always() }}
+        run:
+          pabot --testlevelsplit --outputdir=python/results/robotframework --output=robot_test.xml
+          python/robotframework/**
         continue-on-error: true
+
+      - name: Process robotframework results
+        # Run this step even if the test step ahead fails
+        if: ${{ always() }}
+        uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
+        with:
+          # Path to your test results.
+          junit-paths: python/results/robotframework/robot_test.xml
+          # Provide your Trunk organization slug.
+          org-slug: ${{ vars.ORG_SLUG }}
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_TOKEN }}
+          # Variant to distinguish between OS platforms
+          variant: ${{ matrix.variant }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.robotframework_tests.outcome }}
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
