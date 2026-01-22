@@ -19,7 +19,7 @@ jobs:
 
       - name: Run tests
         id: run_tests
-        run: bazel test //bazel/gtest/test:stock_data_test --build_event_json_file=build_events.json
+        run: bazel test //bazel/python/tests:calculator_test --build_event_json_file=build_events.json
         continue-on-error: true
 
       - name: Process test results

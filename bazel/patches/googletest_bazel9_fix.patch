@@ -1,0 +1,11 @@
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -76,6 +76,8 @@
+     ],
+ )
+ 
++load("@rules_cc//cc:cc_library.bzl", "cc_library")
++
+ cc_library(
+     name = "gtest",
+     testonly = 1,

@@ -7,4 +7,4 @@ cc_test(
         "//bazel/gtest:stock_data",
         "@googletest//:gtest_main",
     ],
-) 
+)
