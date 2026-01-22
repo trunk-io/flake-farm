@@ -8,15 +8,15 @@ importers:
 
   .:
     dependencies:
+      dayjs:
+        specifier: ^1.11.19
+        version: 1.11.19
       jasmine:
         specifier: ^5.4.0
         version: 5.4.0
       jasmine-reporters:
         specifier: ^2.5.2
         version: 2.5.2
-      moment:
-        specifier: ^2.30.1
-        version: 2.30.1
     devDependencies:
       '@cucumber/cucumber':
         specifier: ^11.0.1
@@ -844,6 +844,9 @@ packages:
   date-format@4.0.14:
     resolution: {integrity: sha512-39BOQLs9ZjKh0/patS9nrT8wc3ioX3/eA/zgbKNopnF2wCqJEoxywwwElATYvRsXdnOxA/OQeQoFZ3rFjVajhg==}
     engines: {node: '>=4.0'}
+
+  dayjs@1.11.19:
+    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
 
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -1773,9 +1776,6 @@ packages:
     resolution: {integrity: sha512-fg7OZaQBcL4/L+AK5f4iVqf9OMbCclXfy/znXRxTVhJSeW5AIlS9AwheYwDaXM3lVW7OBeaeUEY3gbaC6cLlSA==}
     engines: {node: '>= 0.8.0'}
     hasBin: true
-
-  moment@2.30.1:
-    resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
 
   ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
@@ -3673,6 +3673,8 @@ snapshots:
 
   date-format@4.0.14: {}
 
+  dayjs@1.11.19: {}
+
   debug@2.6.9:
     dependencies:
       ms: 2.0.0
@@ -4815,8 +4817,6 @@ snapshots:
       subarg: 1.0.0
       through2: 2.0.5
       xtend: 4.0.2
-
-  moment@2.30.1: {}
 
   ms@2.0.0: {}
 
