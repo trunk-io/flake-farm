@@ -33,15 +33,18 @@ jobs:
         run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
       - name: Run tests
-        uses: ./.github/actions/analytics-uploader-wrapper-with-variant
+        run: cargo nextest run --profile=ci --manifest-path=./rust/Cargo.toml
+
+      - name: Upload results
+        # Run this step even if the test step ahead fails
+        if: ${{ always() }}
+        uses: trunk-io/analytics-uploader@main
         with:
-          token-staging: ${{ secrets.TRUNK_STAGING_ORG_API_TOKEN }}
-          token-prod: ${{ secrets.TRUNK_PROD_ORG_API_TOKEN }}
-          token-dev: ${{ secrets.TRUNK_DEV_ORG_API_TOKEN }}
-          token-dev2: ${{ secrets.TRUNK_DEV2_ORG_API_TOKEN }}
-          token-dev3: ${{ secrets.TRUNK_DEV3_ORG_API_TOKEN }}
-          token-dev4: ${{ secrets.TRUNK_DEV4_ORG_API_TOKEN }}
-          cli-version: ${{ inputs.cli-version }}
+          # Path to your test results.
           junit-paths: rust/**/nextest/ci/*junit.xml
-          run: cargo nextest run --profile=ci --manifest-path=./rust/Cargo.toml
+          # Provide your Trunk organization slug.
+          org-slug: trunk
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_TOKEN }}
+          # Variant to distinguish between OS platforms
           variant: test-variant
