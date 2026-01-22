@@ -1,32 +1,29 @@
 # Bazel Python Example
 
-This directory contains a simple Python example demonstrating Bazel's Python testing capabilities.
+This directory contains a Python example demonstrating Bazel's Python testing capabilities with flaky tests.
 
 ## Structure
 
-- `src/calculator.py` - A simple Calculator class with basic arithmetic operations
-- `tests/calculator_test.py` - Unit tests using Python's `unittest` framework
+- `src/stock_data.py` - Stock data fetcher using Polygon.io API
+- `tests/stock_data_test.py` - Tests for stock data fetching (includes flaky tests)
 
 ## Running Tests
 
 To run the tests:
 
 ```bash
-bazel test //bazel/python/tests:calculator_test
+bazel test //bazel/python/tests:stock_data_test
 ```
 
 To run with Build Event Protocol output (for CI integration):
 
 ```bash
-bazel test //bazel/python/tests:calculator_test --build_event_json_file=build_events.json
+bazel test //bazel/python/tests:stock_data_test --build_event_json_file=build_events.json
 ```
 
 ## Test Coverage
 
-The tests cover:
-
-- Addition
-- Subtraction
-- Multiplication
-- Division
-- Division by zero error handling
+### Stock Data Tests
+- Fetches live stock data for top 10 companies
+- Validates data structure and values
+- Includes flaky tests that check if stocks are "up" (close > open)
