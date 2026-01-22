@@ -3,10 +3,10 @@
 ## running
 
 ```shell
-bazel test --cxxopt=-std=c++14 --test_output=all //bazel/gtest:hello_test
+bazel test --cxxopt=-std=c++14 --test_output=all //bazel/gtest/test:stock_data_test
 ```
 
-The XML output will be generated at `bazel-testlogs/hello_test/test.xml`
+The XML output will be generated at `bazel-testlogs/bazel/gtest/test/stock_data_test/test.xml`
 
 Adapted from the
 [GoogleTest Bazel Quickstart](https://google.github.io/googletest/quickstart-bazel.html)
