@@ -19,6 +19,8 @@ jobs:
 
       - name: Run tests
         id: run_tests
+        env:
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         run: bazel test //bazel/python/tests:stock_data_test --build_event_json_file=build_events.json
         continue-on-error: true
 

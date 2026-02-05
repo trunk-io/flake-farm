@@ -24,6 +24,7 @@ bazel test //bazel/python/tests:stock_data_test --build_event_json_file=build_ev
 ## Test Coverage
 
 ### Stock Data Tests
+
 - Fetches live stock data for top 10 companies
 - Validates data structure and values
 - Includes flaky tests that check if stocks are "up" (close > open)

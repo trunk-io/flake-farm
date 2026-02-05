@@ -7,8 +7,11 @@ from bazel.python.src.stock_data import StockData, StockDataManager
 
 
 def get_api_key() -> str:
-    """Get API key from environment variable, with a default for testing."""
-    return os.environ.get("POLYGON_API_KEY", "dWJwiSUGqP7sZtIJYy9Vko2uCACcKaCD")
+    """Get API key from environment variable."""
+    api_key = os.environ.get("POLYGON_API_KEY")
+    if not api_key:
+        raise ValueError("POLYGON_API_KEY environment variable is required")
+    return api_key
 
 
 class StockDataTest(unittest.TestCase):
