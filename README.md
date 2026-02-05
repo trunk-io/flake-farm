@@ -12,16 +12,17 @@ with intent to flake.
 
 ### Demonstrated testing frameworks
 
-| Language   | Frameworks                           | Workflow                                                                                               |
-| ---------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| python     | pytest, robotframework, behave       | [Python Tests](.github/workflows/python-tests.yaml), [Retry Tests](.github/workflows/retry-tests.yaml) |
-| javascript | mocha, jasmine, jest, playwright     | [JavaScript Tests](.github/workflows/javascript-tests.yaml)                                            |
-| java       | JUnit (Gradle/Maven), Playwright     | [Java Tests](.github/workflows/java-tests.yaml)                                                        |
-| go         | go test (go-junit-report, gotestsum) | [Go Tests](.github/workflows/go.yaml)                                                                  |
-| php        | phpunit                              | [PHP Tests](.github/workflows/php.yaml)                                                                |
-| ruby       | rspec, minitest                      | [Ruby Tests](.github/workflows/ruby-tests.yaml)                                                        |
-| rust       | nextest                              | [Rust Tests](.github/workflows/rust-tests.yaml)                                                        |
-| bazel      | gtest                                | [Bazel Tests](.github/workflows/bazel.yaml)                                                            |
+| Language   | Frameworks                                | Workflow                                                                                               |
+| ---------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Python     | pytest, robotframework, behave            | [Python Tests](.github/workflows/python-tests.yaml), [Retry Tests](.github/workflows/retry-tests.yaml) |
+| JavaScript | mocha, jasmine, jest, playwright          | [JavaScript Tests](.github/workflows/javascript-tests.yaml)                                            |
+| Java       | JUnit (Gradle/Maven), Playwright          | [Java Tests](.github/workflows/java-tests.yaml)                                                        |
+| Go         | go test (go-junit-report, gotestsum)      | [Go Tests](.github/workflows/go.yaml)                                                                  |
+| PHP        | phpunit                                   | [PHP Tests](.github/workflows/php.yaml)                                                                |
+| Ruby       | rspec (with trunk rspec plugin), minitest | [Ruby Tests](.github/workflows/ruby-tests.yaml)                                                        |
+| Rust       | nextest                                   | [Rust Tests](.github/workflows/rust-tests.yaml)                                                        |
+| C#         | xUnit                                     | [C# Tests](.github/workflows/csharp-tests.yaml)                                                        |
+| Bazel      | gtest                                     | [Bazel Tests](.github/workflows/bazel.yaml)                                                            |
 
 ### Mission
 

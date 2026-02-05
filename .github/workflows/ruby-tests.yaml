@@ -18,34 +18,60 @@ jobs:
           ruby-version: 3.4.7
           bundler-cache: true
 
-      - name: Run rspec tests
-        if: ${{ always() }}
-        run: bundle exec rspec ruby/rspec --format RspecJunitFormatter --out rspec_test.xml
-
+      # this is the recommended way to run rspec tests using the trunk rspec plugin
       - name: Run rspec tests (with trunk rspec plugin)
+        id: rspec_trunk_tests
         if: ${{ always() }}
         working-directory: ruby/trunk_rspec
         env:
-          TRUNK_ORG_URL_SLUG: trunk
+          TRUNK_ORG_URL_SLUG: ${{ vars.ORG_SLUG }}
           TRUNK_API_TOKEN: ${{ secrets.TRUNK_TOKEN }}
         run: bundle exec rspec
+        continue-on-error: true
 
-      - name: Run minitest tests
+      - name: Run rspec tests
+        id: rspec_tests
         if: ${{ always() }}
-        run: bundle exec ruby ruby/minitest/mixer.rb
+        run: bundle exec rspec ruby/rspec --format RspecJunitFormatter --out rspec_test.xml
+        continue-on-error: true
 
-      - name: Upload results
+      - name: Process rspec results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
           # Path to your test results.
-          junit-paths: "**/rspec_test.xml,**/ruby/minitest/results/*.xml"
+          junit-paths: "**/rspec_test.xml"
           # Provide your Trunk organization slug.
-          org-slug: trunk
+          org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.rspec_tests.outcome }}
+
+      - name: Run minitest tests
+        id: minitest_tests
+        if: ${{ always() }}
+        run: bundle exec ruby ruby/minitest/mixer.rb
         continue-on-error: true
+
+      - name: Process minitest results
+        # Run this step even if the test step ahead fails
+        if: ${{ always() }}
+        uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
+        with:
+          # Path to your test results.
+          junit-paths: "**/ruby/minitest/results/*.xml"
+          # Provide your Trunk organization slug.
+          org-slug: ${{ vars.ORG_SLUG }}
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_TOKEN }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.minitest_tests.outcome }}
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}

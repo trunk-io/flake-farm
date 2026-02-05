@@ -22,29 +22,36 @@ jobs:
       - name: Run tests with Gradle
         if: ${{ always() }}
         run: gradle test --project-dir java/gradle
+        continue-on-error: true
 
       - name: Run playwright tests with Maven
         if: ${{ always() }}
         run: mvn test --file java/playwright/pom.xml --quiet
+        continue-on-error: true
 
       - name: Run tests with Maven
+        id: run_tests
         if: ${{ always() }}
         run: mvn test --file java/maven/pom.xml --quiet
+        continue-on-error: true
 
-      - name: Upload results
+      - name: Process test results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
           # Path to your test results.
           junit-paths:
             "**/gradle/**/test-results/**/*.xml, **/surefire-reports/*.xml,
             **/playwright/**/surefire-reports/*.xml"
           # Provide your Trunk organization slug.
-          org-slug: trunk
+          org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
-        continue-on-error: true
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.run_tests.outcome }}
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
