@@ -21,27 +21,24 @@ jobs:
       - name: Install nextest
         run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
+      - name: Install trunk-analytics-cli
+        run: bash get-trunk-cli
+
       - name: Run rust tests
         id: run_tests
         if: ${{ always() }}
         run: cargo nextest run --profile=ci --manifest-path=./rust/Cargo.toml
         continue-on-error: true
-
-      - name: Process test results
-        # Run this step even if the test step ahead fails
-        if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@main
+        
+      - name: Run rust tests and upload results
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
-        with:
-          # Path to your test results.
-          junit-paths: rust/**/nextest/ci/*junit.xml
-          # Provide your Trunk organization slug.
-          org-slug: ${{ vars.ORG_SLUG }}
-          # Provide your Trunk API token as a GitHub secret.
-          token: ${{ secrets.TRUNK_TOKEN }}
-          # Pass the test outcome for quarantining support
-          previous-step-outcome: ${{ steps.run_tests.outcome }}
+          TRUNK_API_TOKEN: ${{ secrets.TRUNK_TOKEN }}
+        run: |
+          ./trunk-analytics-cli test \
+            --org-url-slug ${{ vars.ORG_SLUG }} \
+            --junit-paths "rust/**/nextest/ci/*junit.xml" \
+            -- cargo nextest run --profile=ci --manifest-path=./rust/Cargo.toml
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
@@ -50,3 +47,4 @@ jobs:
           name: rust-junit-results
           path: rust/**/nextest/ci/*junit.xml
           retention-days: 7
+
