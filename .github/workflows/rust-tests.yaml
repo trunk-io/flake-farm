@@ -6,7 +6,7 @@ on:
   pull_request: {}
 
 jobs:
-  test:
+  rust_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,11 +24,27 @@ jobs:
       - name: Install trunk-analytics-cli
         run: bash get-trunk-cli
 
+      - name: Run rust tests
+        id: run_tests
+        if: ${{ always() }}
+        run: cargo nextest run --profile=ci --manifest-path=./rust/Cargo.toml
+        continue-on-error: true
+        
       - name: Run rust tests and upload results
         env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
           TRUNK_API_TOKEN: ${{ secrets.TRUNK_TOKEN }}
         run: |
           ./trunk-analytics-cli test \
-            --org-url-slug trunk \
+            --org-url-slug ${{ vars.ORG_SLUG }} \
             --junit-paths "rust/**/nextest/ci/*junit.xml" \
             -- cargo nextest run --profile=ci --manifest-path=./rust/Cargo.toml
+
+      - name: Upload JUnit XML artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-junit-results
+          path: rust/**/nextest/ci/*junit.xml
+          retention-days: 7
+

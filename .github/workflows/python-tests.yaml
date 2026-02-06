@@ -6,43 +6,87 @@ on:
   pull_request: {}
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  python_test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            variant: linux
+          - os: macos-latest
+            variant: macOS
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: 3.x
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run pytest tests
+        id: pytest_tests
         if: ${{ always() }}
         run:
           pytest python/pytest/** --junitxml=python/results/pytest/pytest_test.xml -o
           junit_family=xunit1
+        continue-on-error: true
+
+      - name: Process pytest results
+        # Run this step even if the test step ahead fails
+        if: ${{ always() }}
+        uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
+        with:
+          # Path to your test results.
+          junit-paths: python/results/pytest/pytest_test.xml
+          # Provide your Trunk organization slug.
+          org-slug: ${{ vars.ORG_SLUG }}
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_TOKEN }}
+          # Variant to distinguish between OS platforms
+          variant: ${{ matrix.variant }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.pytest_tests.outcome }}
 
       - name: Run robotframework tests
+        id: robotframework_tests
         if: ${{ always() }}
         run:
           pabot --testlevelsplit --outputdir=python/results/robotframework --output=robot_test.xml
           python/robotframework/**
+        continue-on-error: true
 
-      - name: Upload results
+      - name: Process robotframework results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
-          cli-version: latest
           # Path to your test results.
-          junit-paths: "**/*_test.xml"
+          junit-paths: python/results/robotframework/robot_test.xml
           # Provide your Trunk organization slug.
-          org-slug: trunk
+          org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
-        continue-on-error: true
+          # Variant to distinguish between OS platforms
+          variant: ${{ matrix.variant }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.robotframework_tests.outcome }}
+
+      - name: Upload JUnit XML artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-junit-results-${{ matrix.variant }}
+          path: |
+            python/results/**/*_test.xml
+            python/**/*_test.xml
+          retention-days: 7

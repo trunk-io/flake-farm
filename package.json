@@ -13,9 +13,9 @@
     "test": "npm run jest-test"
   },
   "dependencies": {
+    "dayjs": "^1.11.19",
     "jasmine": "^5.4.0",
-    "jasmine-reporters": "^2.5.2",
-    "moment": "^2.30.1"
+    "jasmine-reporters": "^2.5.2"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^11.0.1",

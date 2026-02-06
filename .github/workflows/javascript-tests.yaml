@@ -6,7 +6,7 @@ on:
   pull_request: {}
 
 jobs:
-  test:
+  javascript_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,36 +25,101 @@ jobs:
         run: |
           pnpm install
           sudo npx playwright install-deps          
-          npx playwright install 
+          npx playwright install
 
       - name: Run Mocha Tests
-        if: ${{ always() }}
+        id: mocha_tests
         run: |
           npm run mocha-test || true
-          cat javascript/tests/mocha/mocha_test.xml          
+          cat javascript/tests/mocha/mocha_test.xml
+        continue-on-error: true
 
-      - name: Run Jest Tests
-        if: ${{ always() }}
-        run: npm run jest-test
-
-      - name: Run Jasmine Tests
-        if: ${{ always() }}
-        run: npm run jasmine-test
-
-      - name: Run Playwright Tests
-        if: ${{ always() }}
-        run: npm run playwright-test
-
-      - name: Upload results
+      - name: Process mocha results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
-          cli-version: 0.10.0-beta.3
           # Path to your test results.
-          junit-paths: "**/*_test.xml,**/junitresults-*.xml,**/mocha_test.xml"
+          junit-paths: javascript/tests/mocha/mocha_test.xml
           # Provide your Trunk organization slug.
-          org-slug: trunk
+          org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.mocha_tests.outcome }}
+
+      - name: Run Jest Tests
+        id: jest_tests
+        run: npm run jest-test
         continue-on-error: true
+
+      - name: Process jest results
+        # Run this step even if the test step ahead fails
+        if: ${{ always() }}
+        uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
+        with:
+          # Path to your test results.
+          junit-paths: "**/junitresults-*.xml"
+          # Provide your Trunk organization slug.
+          org-slug: ${{ vars.ORG_SLUG }}
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_TOKEN }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.jest_tests.outcome }}
+
+      - name: Run Jasmine Tests
+        id: jasmine_tests
+        run: npm run jasmine-test
+        continue-on-error: true
+
+      - name: Process jasmine results
+        # Run this step even if the test step ahead fails
+        if: ${{ always() }}
+        uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
+        with:
+          # Path to your test results.
+          junit-paths: "**/*_test.xml"
+          # Provide your Trunk organization slug.
+          org-slug: ${{ vars.ORG_SLUG }}
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_TOKEN }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.jasmine_tests.outcome }}
+
+      - name: Run Playwright Tests
+        id: playwright_tests
+        run: npm run playwright-test
+        continue-on-error: true
+
+      - name: Process playwright results
+        # Run this step even if the test step ahead fails
+        if: ${{ always() }}
+        uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
+        with:
+          # Path to your test results.
+          junit-paths: tests/playwright/junitresults-playwright.xml
+          # Provide your Trunk organization slug.
+          org-slug: ${{ vars.ORG_SLUG }}
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_TOKEN }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.playwright_tests.outcome }}
+
+      - name: Upload JUnit XML artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: javascript-junit-results
+          path: |
+            **/*_test.xml
+            **/junitresults-*.xml
+            **/mocha_test.xml
+          retention-days: 7

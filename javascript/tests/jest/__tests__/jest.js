@@ -1,18 +1,18 @@
-const moment = require("moment");
+const dayjs = require("dayjs");
 
 describe("Jest - Day of the Week Tests", () => {
   test("today is Mon || Tues || Wed", () => {
-    const today = moment().format("dddd");
+    const today = dayjs().format("dddd");
     expect(["Monday", "Tuesday", "Wednesday"]).toContain(today);
   });
 
   test("today is Thursday or Friday", () => {
-    const today = moment().format("dddd");
+    const today = dayjs().format("dddd");
     expect(["Thursday", "Friday"]).toContain(today);
   });
 
   test("today is Saturday or Sunday", () => {
-    const today = moment().format("dddd");
+    const today = dayjs().format("dddd");
     expect(["Saturday", "Sunday"]).toContain(today);
   });
 });

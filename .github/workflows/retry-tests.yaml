@@ -6,14 +6,14 @@ on:
   pull_request: {}
 
 jobs:
-  test:
+  retry_test:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
       - name: set up python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.x
 
@@ -22,7 +22,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: trunk install
-        uses: trunk-io/trunk-action/install@v1.1.16
+        uses: trunk-io/trunk-action/install@v1
         with:
           tools: gh
 
@@ -37,24 +37,34 @@ jobs:
           if_no_artifact_found: error
 
       - name: test
-        id: test
+        id: run_tests
         shell: bash
         run: behave --junit-directory=python/results --junit python/behave
         continue-on-error: true
 
-      - name: Upload results
+      - name: Process test results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
-          cli-version: 0.10.0-beta.3
           # Path to your test results.
           junit-paths: "**/python/results/*-behave.xml"
           # Provide your Trunk organization slug.
-          org-slug: trunk
+          org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
-        continue-on-error: true
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.run_tests.outcome }}
+
+      - name: Upload JUnit XML artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: retry-behave-junit-results
+          path: "**/python/results/*-behave.xml"
+          retention-days: 7
 
       - name: upload artifacts
         if: ${{ failure() }}
@@ -65,8 +75,7 @@ jobs:
           retention-days: 5
 
       - name: trigger job re-run
-        if:
-          ${{ failure() && steps.test.conclusion == 'failure' && fromJSON(github.run_attempt) < 5}}
+        if: ${{ failure() && steps.run_tests.conclusion == 'failure' && fromJSON(github.run_attempt) < 5}}
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
