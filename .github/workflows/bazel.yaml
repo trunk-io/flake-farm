@@ -21,7 +21,7 @@ jobs:
         id: run_tests
         env:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
-        run: bazel test //bazel/python/tests:stock_data_test --build_event_json_file=build_events.json
+        run: bazel test //bazel/python/tests:stock_data_test --build_event_binary_file=bep.bin --nobuild_event_binary_file_path_conversion
         continue-on-error: true
 
       - name: Process test results
@@ -31,7 +31,7 @@ jobs:
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
-          bazel-bep-path: build_events.json
+          bazel-bep-path: bep.bin
           org-slug: ${{ vars.ORG_SLUG }}
           token: ${{ secrets.TRUNK_TOKEN }}
           # Pass the test outcome for quarantining support
