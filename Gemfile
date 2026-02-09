@@ -12,4 +12,4 @@ gem 'minitest-reporters', '~> 1.6'
 
 gem 'ostruct'
 
-gem 'rspec_trunk_flaky_tests', '~> 0.11.6'
+gem 'rspec_trunk_flaky_tests', '~> 0.12.5'
