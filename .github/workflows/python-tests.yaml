@@ -59,7 +59,7 @@ jobs:
         id: robotframework_tests
         if: ${{ always() }}
         run:
-          pabot --testlevelsplit --outputdir=python/results/robotframework --output=robot_test.xml
+          pabot --testlevelsplit --outputdir=python/results/robotframework --xunit=robot_test.xml --output=robot_test.xml
           python/robotframework/**
         continue-on-error: true
 
