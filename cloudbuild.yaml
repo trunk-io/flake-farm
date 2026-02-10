@@ -1,0 +1,54 @@
+steps:
+  - name: gcr.io/cloud-builders/npm
+    id: jest-test
+    script: |
+      #!/bin/bash
+      set -euo pipefail
+      npm install -g pnpm
+      pnpm install
+      pnpm run jest-test
+    timeout: 600s
+    allowExitCodes: [0, 1]
+
+  - name: gcr.io/cloud-builders/gcloud
+    id: analytics-upload
+    script: |
+      #!/bin/bash
+      set -euo pipefail
+      ./get-trunk-cli
+      ./trunk-analytics-cli upload \
+        --junit-paths "**/junitresults-*.xml" \
+        --org-url-slug "trunk" \
+        --token "${TRUNK_API_TOKEN}"
+    waitFor:
+      - jest-test
+    timeout: 300s
+    env:
+      # Google Cloud Build default substitution variables
+      - "PROJECT_ID=${PROJECT_ID}" # required
+      - "BUILD_ID=${BUILD_ID}" # required
+      - "PROJECT_NUMBER=${PROJECT_NUMBER}"
+      - "LOCATION=${LOCATION}"
+      - "TRIGGER_NAME=${TRIGGER_NAME}" # required
+      - "COMMIT_SHA=${COMMIT_SHA}"
+      - "REVISION_ID=${REVISION_ID}"
+      - "SHORT_SHA=${SHORT_SHA}"
+      - "REPO_NAME=${REPO_NAME}"
+      - "REPO_FULL_NAME=${REPO_FULL_NAME}"
+      - "BRANCH_NAME=${BRANCH_NAME}" # required
+      - "TAG_NAME=${TAG_NAME}"
+      - "REF_NAME=${REF_NAME}"
+      # Google Cloud Build triggered by GitHub PR substitution variables
+      - "_HEAD_BRANCH=${_HEAD_BRANCH}" # required
+      - "_BASE_BRANCH=${_BASE_BRANCH}"
+      - "_HEAD_REPO_URL=${_HEAD_REPO_URL}"
+      - "_PR_NUMBER=${_PR_NUMBER}" # required
+    secretEnv: ['TRUNK_API_TOKEN']
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1200s
+availableSecrets:
+  secretManager:
+    - versionName: projects/${PROJECT_ID}/secrets/prod-trunk-org-token/versions/latest
+      env: TRUNK_API_TOKEN
