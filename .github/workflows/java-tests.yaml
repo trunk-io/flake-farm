@@ -44,8 +44,7 @@ jobs:
         with:
           # Path to your test results.
           junit-paths:
-            "**/gradle/**/test-results/**/*.xml, **/surefire-reports/*.xml,
-            **/playwright/**/surefire-reports/*.xml"
+            "**/gradle/**/test-results/**/*.xml,**/surefire-reports/*.xml,**/playwright/**/surefire-reports/*.xml"
           # Provide your Trunk organization slug.
           org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
