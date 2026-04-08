@@ -23,6 +23,7 @@ jobs:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         run: |
           bazel test //bazel/python/tests:stock_data_test \
+            --config=buildbuddy \
             --remote_header=x-buildbuddy-api-key=${{ secrets.BUILDBUDDY_API_KEY }} \
             --build_event_binary_file=bep.bin \
             --nobuild_event_binary_file_path_conversion
