@@ -6,4 +6,4 @@ module(
 )
 
 # Add rules_python for Python build rules
-bazel_dep(name = "rules_python", version = "1.7.0")
+bazel_dep(name = "rules_python", version = "1.9.0")
