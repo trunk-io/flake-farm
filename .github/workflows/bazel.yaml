@@ -11,28 +11,57 @@ jobs:
   bazel_test:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        backend:
+          - local
+          - buildbuddy
+        bep_format:
+          - binary
+          - json
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Bazelisk
         uses: bazelbuild/setup-bazelisk@v3
 
-      - name: Run tests
-        id: run_tests
+      - name: Run tests (binary BEP)
+        if: matrix.bep_format == 'binary'
+        id: run_tests_binary
         env:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
-        run: bazel test //bazel/python/tests:stock_data_test --build_event_binary_file=bep.bin --nobuild_event_binary_file_path_conversion
+        run: |
+          bazel test //bazel/python/tests:stock_data_test \
+            ${{ matrix.backend == 'buildbuddy' && '--config=buildbuddy' || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && format('--remote_header=x-buildbuddy-api-key={0}', secrets.BUILDBUDDY_API_KEY) || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && '--remote_download_regex=.*/test.xml' || '' }} \
+            --build_event_binary_file=bep.bin \
+            --nobuild_event_binary_file_path_conversion
+        continue-on-error: true
+
+      - name: Run tests (JSON BEP)
+        if: matrix.bep_format == 'json'
+        id: run_tests_json
+        env:
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+        run: |
+          bazel test //bazel/python/tests:stock_data_test \
+            ${{ matrix.backend == 'buildbuddy' && '--config=buildbuddy' || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && format('--remote_header=x-buildbuddy-api-key={0}', secrets.BUILDBUDDY_API_KEY) || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && '--remote_download_regex=.*/test.xml' || '' }} \
+            --build_event_json_file=build_events.json \
+            --nobuild_event_json_file_path_conversion
         continue-on-error: true
 
       - name: Process test results
-        # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
-          bazel-bep-path: bep.bin
+          bazel-bep-path: ${{ matrix.bep_format == 'binary' && 'bep.bin' || 'build_events.json' }}
           org-slug: ${{ vars.ORG_SLUG }}
           token: ${{ secrets.TRUNK_TOKEN }}
-          # Pass the test outcome for quarantining support
-          previous-step-outcome: ${{ steps.run_tests.outcome }}
+          previous-step-outcome: ${{ matrix.bep_format == 'binary' && steps.run_tests_binary.outcome || steps.run_tests_json.outcome }}
