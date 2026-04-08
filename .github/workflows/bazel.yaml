@@ -14,6 +14,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        backend:
+          - local
+          - buildbuddy
         bep_format:
           - binary
           - json
@@ -31,6 +34,9 @@ jobs:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         run: |
           bazel test //bazel/python/tests:stock_data_test \
+            ${{ matrix.backend == 'buildbuddy' && '--config=buildbuddy' || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && format('--remote_header=x-buildbuddy-api-key={0}', secrets.BUILDBUDDY_API_KEY) || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && '--remote_download_regex=.*/test.xml' || '' }} \
             --build_event_binary_file=bep.bin \
             --nobuild_event_binary_file_path_conversion
         continue-on-error: true
@@ -42,6 +48,9 @@ jobs:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         run: |
           bazel test //bazel/python/tests:stock_data_test \
+            ${{ matrix.backend == 'buildbuddy' && '--config=buildbuddy' || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && format('--remote_header=x-buildbuddy-api-key={0}', secrets.BUILDBUDDY_API_KEY) || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && '--remote_download_regex=.*/test.xml' || '' }} \
             --build_event_json_file=build_events.json \
             --nobuild_event_json_file_path_conversion
         continue-on-error: true
