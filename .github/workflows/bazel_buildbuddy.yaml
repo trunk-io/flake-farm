@@ -61,4 +61,5 @@ jobs:
           bazel-bep-path: ${{ matrix.bep_format == 'binary' && 'bep.bin' || 'build_events.json' }}
           org-slug: ${{ vars.ORG_SLUG }}
           token: ${{ secrets.TRUNK_TOKEN }}
+          verbose: true
           previous-step-outcome: ${{ matrix.bep_format == 'binary' && steps.run_tests_binary.outcome || steps.run_tests_json.outcome }}
