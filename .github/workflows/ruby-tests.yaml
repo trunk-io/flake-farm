@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: 0 */6 * * *
   pull_request: {}
+  workflow_dispatch:
+    inputs:
+      rspec_trunk_flaky_tests_version:
+        description: "Version of rspec_trunk_flaky_tests gem to use (e.g., 0.12.5)"
+        required: false
+        type: string
 
 jobs:
   ruby_test:
@@ -12,11 +18,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Override rspec_trunk_flaky_tests version
+        if: ${{ inputs.rspec_trunk_flaky_tests_version }}
+        run: |
+          sed -i "s/gem 'rspec_trunk_flaky_tests'.*/gem 'rspec_trunk_flaky_tests', '${{ inputs.rspec_trunk_flaky_tests_version }}'/" Gemfile
+          cat Gemfile
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4.7
           bundler-cache: true
+
+      - name: Update rspec_trunk_flaky_tests
+        if: ${{ inputs.rspec_trunk_flaky_tests_version }}
+        run: bundle update rspec_trunk_flaky_tests
 
       # this is the recommended way to run rspec tests using the trunk rspec plugin
       - name: Run rspec tests (with trunk rspec plugin)
