@@ -28,7 +28,11 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4.7
-          bundler-cache: true
+          bundler-cache: ${{ !inputs.rspec_trunk_flaky_tests_version }}
+
+      - name: Install dependencies with custom gem version
+        if: ${{ inputs.rspec_trunk_flaky_tests_version }}
+        run: bundle install
 
       - name: Update rspec_trunk_flaky_tests
         if: ${{ inputs.rspec_trunk_flaky_tests_version }}
