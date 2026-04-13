@@ -28,11 +28,11 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4.7
-          bundler-cache: true
+          bundler-cache: ${{ !inputs.rspec_trunk_flaky_tests_version }}
 
-      - name: Update rspec_trunk_flaky_tests
+      - name: Install dependencies with custom gem version
         if: ${{ inputs.rspec_trunk_flaky_tests_version }}
-        run: bundle update rspec_trunk_flaky_tests
+        run: bundle install
 
       # this is the recommended way to run rspec tests using the trunk rspec plugin
       - name: Run rspec tests (with trunk rspec plugin)
