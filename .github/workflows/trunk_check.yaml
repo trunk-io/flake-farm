@@ -2,26 +2,44 @@ name: Trunk Check
 
 on:
   pull_request:
+    branches:
+      - main
+      - staging
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
-permissions:
-  contents: read
-  # Required for Trunk to post annotations
-  checks: write
+permissions: read-all
+
+# jobs:
+#   trunk_check:
+#     name: Trunk Check
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       - name: Trunk Check
+#         uses: trunk-io/trunk-action@v1
+#         with:
+#           cache: false
+#           timeout-seconds: 1500 # 25 minutes in seconds
+#           cat-trunk-debug-logs: true
+#           github-token: ${{ github.token }}
+#           debug: true
+
 
 jobs:
-  trunk_check:
-    name: Trunk Check
+  lint:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Trunk Check
+      - uses: actions/checkout@v4
+      - name: Trunk Code Quality
         uses: trunk-io/trunk-action@v1
         with:
-          cache: false
-          timeout-seconds: 1500 # 25 minutes in seconds
-          cat-trunk-debug-logs: true
-          github-token: ${{ github.token }}
-          debug: true
+          post-annotations: true
