@@ -1,13 +1,14 @@
 """Stock data fetcher using Polygon.io API."""
 
 import json
+import os
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
-from typing import Dict, Iterable, Optional, Set
+from typing import Dict, Iterable, List, Optional, Set
 
 
 class RateLimitError(Exception):
@@ -33,120 +34,26 @@ class StockInfo:
     timestamp: str
 
 
+def _load_tracked_ticker_names() -> Dict[str, str]:
+    tickers_path = os.path.join(os.path.dirname(__file__), "tracked_tickers.json")
+    with open(tickers_path, encoding="utf-8") as handle:
+        names = json.load(handle)
+    if not isinstance(names, dict):
+        raise ValueError("tracked_tickers.json must contain a ticker-to-name mapping")
+    return names
+
+
 class StockData:
     """Fetches and caches stock data from Polygon.io API."""
 
     POLYGON_BASE = "https://api.polygon.io"
 
-    # Large-cap US equities tracked by tests
-    TRACKED_TICKERS = [
-        "AAPL",  # Apple
-        "MSFT",  # Microsoft
-        "GOOGL",  # Alphabet
-        "AMZN",  # Amazon
-        "NVDA",  # NVIDIA
-        "META",  # Meta
-        "BRK.B",  # Berkshire Hathaway
-        "TSLA",  # Tesla
-        "UNH",  # UnitedHealth
-        "JNJ",  # Johnson & Johnson
-        "V",  # Visa
-        "MA",  # Mastercard
-        "PG",  # Procter & Gamble
-        "HD",  # Home Depot
-        "CVX",  # Chevron
-        "MRK",  # Merck
-        "ABBV",  # AbbVie
-        "PEP",  # PepsiCo
-        "KO",  # Coca-Cola
-        "COST",  # Costco
-        "WMT",  # Walmart
-        "MCD",  # McDonald's
-        "CSCO",  # Cisco
-        "ACN",  # Accenture
-        "ADBE",  # Adobe
-        "CRM",  # Salesforce
-        "NFLX",  # Netflix
-        "AMD",  # AMD
-        "INTC",  # Intel
-        "DIS",  # Disney
-        "BAC",  # Bank of America
-        "JPM",  # JPMorgan Chase
-        "WFC",  # Wells Fargo
-        "GS",  # Goldman Sachs
-        "MS",  # Morgan Stanley
-        "VZ",  # Verizon
-        "T",  # AT&T
-        "CMCSA",  # Comcast
-        "NKE",  # Nike
-        "SBUX",  # Starbucks
-        "LLY",  # Eli Lilly
-        "PFE",  # Pfizer
-        "XOM",  # Exxon Mobil
-        "COP",  # ConocoPhillips
-        "ORCL",  # Oracle
-        "IBM",  # IBM
-        "QCOM",  # Qualcomm
-        "TXN",  # Texas Instruments
-        "AVGO",  # Broadcom
-        "INTU",  # Intuit
-    ]
-
-    TRACKED_TICKER_NAMES = {
-        "AAPL": "Apple",
-        "MSFT": "Microsoft",
-        "GOOGL": "Google",
-        "AMZN": "Amazon",
-        "NVDA": "Nvidia",
-        "META": "Meta",
-        "BRK.B": "Berkshire",
-        "TSLA": "Tesla",
-        "UNH": "UnitedHealth",
-        "JNJ": "Johnson & Johnson",
-        "V": "Visa",
-        "MA": "Mastercard",
-        "PG": "Procter & Gamble",
-        "HD": "Home Depot",
-        "CVX": "Chevron",
-        "MRK": "Merck",
-        "ABBV": "AbbVie",
-        "PEP": "PepsiCo",
-        "KO": "Coca-Cola",
-        "COST": "Costco",
-        "WMT": "Walmart",
-        "MCD": "McDonald's",
-        "CSCO": "Cisco",
-        "ACN": "Accenture",
-        "ADBE": "Adobe",
-        "CRM": "Salesforce",
-        "NFLX": "Netflix",
-        "AMD": "AMD",
-        "INTC": "Intel",
-        "DIS": "Disney",
-        "BAC": "Bank of America",
-        "JPM": "JPMorgan Chase",
-        "WFC": "Wells Fargo",
-        "GS": "Goldman Sachs",
-        "MS": "Morgan Stanley",
-        "VZ": "Verizon",
-        "T": "AT&T",
-        "CMCSA": "Comcast",
-        "NKE": "Nike",
-        "SBUX": "Starbucks",
-        "LLY": "Eli Lilly",
-        "PFE": "Pfizer",
-        "XOM": "Exxon Mobil",
-        "COP": "ConocoPhillips",
-        "ORCL": "Oracle",
-        "IBM": "IBM",
-        "QCOM": "Qualcomm",
-        "TXN": "Texas Instruments",
-        "AVGO": "Broadcom",
-        "INTU": "Intuit",
-    }
+    TRACKED_TICKER_NAMES = _load_tracked_ticker_names()
+    TRACKED_TICKERS: List[str] = list(TRACKED_TICKER_NAMES.keys())
 
     # Polygon may use alternate symbols in grouped daily responses.
     TICKER_SYMBOL_ALIASES = {
+        "BF.B": ["BF.B", "BF-B"],
         "BRK.B": ["BRK.B", "BRK-B"],
     }
 
@@ -194,7 +101,8 @@ class StockData:
             loaded = self._parse_grouped_daily_results(results, tracked_set)
             if loaded:
                 print(
-                    f"Loaded {len(loaded)} tracked tickers from grouped daily ({trade_date.isoformat()})"
+                    f"Loaded {len(loaded)} tracked tickers from grouped daily "
+                    f"({trade_date.isoformat()})"
                 )
                 return
 

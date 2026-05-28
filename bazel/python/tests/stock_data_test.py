@@ -1,4 +1,4 @@
-"""Tests for the stock_data module."""
+"""Tests for the stock_data module (500 S&P 500 tickers)."""
 
 import os
 import random
