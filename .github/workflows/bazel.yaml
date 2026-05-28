@@ -34,6 +34,7 @@ jobs:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         run: |
           bazel test //bazel/python/tests:stock_data_test \
+            --test_env=POLYGON_API_KEY \
             ${{ matrix.backend == 'buildbuddy' && '--config=buildbuddy' || '' }} \
             ${{ matrix.backend == 'buildbuddy' && format('--remote_header=x-buildbuddy-api-key={0}', secrets.BUILDBUDDY_API_KEY) || '' }} \
             ${{ matrix.backend == 'buildbuddy' && '--remote_download_regex=.*/test.xml' || '' }} \
@@ -48,6 +49,7 @@ jobs:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         run: |
           bazel test //bazel/python/tests:stock_data_test \
+            --test_env=POLYGON_API_KEY \
             ${{ matrix.backend == 'buildbuddy' && '--config=buildbuddy' || '' }} \
             ${{ matrix.backend == 'buildbuddy' && format('--remote_header=x-buildbuddy-api-key={0}', secrets.BUILDBUDDY_API_KEY) || '' }} \
             ${{ matrix.backend == 'buildbuddy' && '--remote_download_regex=.*/test.xml' || '' }} \
