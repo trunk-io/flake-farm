@@ -1,6 +1,7 @@
 """Tests for the stock_data module."""
 
 import os
+import re
 import unittest
 
 from bazel.python.src.stock_data import StockData, StockDataManager
@@ -14,6 +15,27 @@ def get_api_key() -> str:
     return api_key
 
 
+def _company_test_slug(company_name: str) -> str:
+    slug = company_name.lower().replace("&", "and")
+    slug = re.sub(r"[^a-z0-9]+", "_", slug)
+    return slug.strip("_")
+
+
+def _make_is_up_test(ticker: str, company_name: str):
+    def test_method(self):
+        info = self.manager.get_stock_info(ticker)
+        self.assertIsNotNone(info)
+        self.assertGreater(
+            info.close_price,
+            info.open_price,
+            f"{company_name} stock is down",
+        )
+
+    test_method.__name__ = f"test_{_company_test_slug(company_name)}_is_up"
+    test_method.__doc__ = f"Test that {company_name} stock is up."
+    return test_method
+
+
 class StockDataTest(unittest.TestCase):
     """Test cases for StockData class."""
 
@@ -24,20 +46,7 @@ class StockDataTest(unittest.TestCase):
         stock_data = StockData(get_api_key())
         cls.manager = StockDataManager(stock_data)
 
-        # Fetch data for all companies
-        tickers = [
-            "AAPL",
-            "MSFT",
-            "GOOGL",
-            "AMZN",
-            "NVDA",
-            "META",
-            "BRK.B",
-            "TSLA",
-            "UNH",
-            "JNJ",
-        ]
-        for ticker in tickers:
+        for ticker in StockData.TRACKED_TICKERS:
             info = cls.manager.get_stock_info(ticker)
             assert info is not None, f"Failed to fetch data for {ticker}"
 
@@ -46,7 +55,7 @@ class StockDataTest(unittest.TestCase):
     def test_all_companies_data_fetched(self):
         """Test that all companies' data was fetched."""
         all_data = self.manager.get_all_data()
-        self.assertEqual(len(all_data), 10)
+        self.assertEqual(len(all_data), len(StockData.TRACKED_TICKERS))
 
         for _ticker, info in all_data.items():
             self.assertGreater(info.close_price, 0.0)
@@ -54,69 +63,15 @@ class StockDataTest(unittest.TestCase):
             self.assertGreater(info.volume, 0)
             self.assertFalse(info.timestamp == "")
 
-    def test_apple_is_up(self):
-        """Test that Apple stock is up."""
-        info = self.manager.get_stock_info("AAPL")
-        self.assertIsNotNone(info)
-        self.assertGreater(info.close_price, info.open_price, "Apple stock is down")
 
-    def test_microsoft_is_up(self):
-        """Test that Microsoft stock is up."""
-        info = self.manager.get_stock_info("MSFT")
-        self.assertIsNotNone(info)
-        self.assertGreater(info.close_price, info.open_price, "Microsoft stock is down")
-
-    def test_google_is_up(self):
-        """Test that Google stock is up."""
-        info = self.manager.get_stock_info("GOOGL")
-        self.assertIsNotNone(info)
-        self.assertGreater(info.close_price, info.open_price, "Google stock is down")
-
-    def test_amazon_is_up(self):
-        """Test that Amazon stock is up."""
-        info = self.manager.get_stock_info("AMZN")
-        self.assertIsNotNone(info)
-        self.assertGreater(info.close_price, info.open_price, "Amazon stock is down")
-
-    def test_nvidia_is_up(self):
-        """Test that Nvidia stock is up."""
-        info = self.manager.get_stock_info("NVDA")
-        self.assertIsNotNone(info)
-        self.assertGreater(info.close_price, info.open_price, "Nvidia stock is down")
-
-    def test_meta_is_up(self):
-        """Test that Meta stock is up."""
-        info = self.manager.get_stock_info("META")
-        self.assertIsNotNone(info)
-        self.assertGreater(info.close_price, info.open_price, "Meta stock is down")
-
-    def test_berkshire_is_up(self):
-        """Test that Berkshire stock is up."""
-        info = self.manager.get_stock_info("BRK.B")
-        self.assertIsNotNone(info)
-        self.assertGreater(info.close_price, info.open_price, "Berkshire stock is down")
-
-    def test_tesla_is_up(self):
-        """Test that Tesla stock is up."""
-        info = self.manager.get_stock_info("TSLA")
-        self.assertIsNotNone(info)
-        self.assertGreater(info.close_price, info.open_price, "Tesla stock is down")
-
-    def test_unitedhealth_is_up(self):
-        """Test that UnitedHealth stock is up."""
-        info = self.manager.get_stock_info("UNH")
-        self.assertIsNotNone(info)
-        self.assertGreater(
-            info.close_price, info.open_price, "UnitedHealth stock is down"
-        )
-
-    def test_johnson_and_johnson_is_up(self):
-        """Test that Johnson & Johnson stock is up."""
-        info = self.manager.get_stock_info("JNJ")
-        self.assertIsNotNone(info)
-        self.assertGreater(
-            info.close_price, info.open_price, "Johnson & Johnson stock is down"
-        )
+for _ticker in StockData.TRACKED_TICKERS:
+    _company_name = StockData.TRACKED_TICKER_NAMES[_ticker]
+    _test_name = f"test_{_company_test_slug(_company_name)}_is_up"
+    setattr(
+        StockDataTest,
+        _test_name,
+        _make_is_up_test(_ticker, _company_name),
+    )
 
 
 if __name__ == "__main__":

@@ -24,8 +24,8 @@ class StockInfo:
 class StockData:
     """Fetches and caches stock data from Polygon.io API."""
 
-    # Top 10 US companies by market cap
-    TOP_COMPANIES = [
+    # Large-cap US equities tracked by tests
+    TRACKED_TICKERS = [
         "AAPL",  # Apple
         "MSFT",  # Microsoft
         "GOOGL",  # Alphabet
@@ -36,7 +36,103 @@ class StockData:
         "TSLA",  # Tesla
         "UNH",  # UnitedHealth
         "JNJ",  # Johnson & Johnson
+        "V",  # Visa
+        "MA",  # Mastercard
+        "PG",  # Procter & Gamble
+        "HD",  # Home Depot
+        "CVX",  # Chevron
+        "MRK",  # Merck
+        "ABBV",  # AbbVie
+        "PEP",  # PepsiCo
+        "KO",  # Coca-Cola
+        "COST",  # Costco
+        "WMT",  # Walmart
+        "MCD",  # McDonald's
+        "CSCO",  # Cisco
+        "ACN",  # Accenture
+        "ADBE",  # Adobe
+        "CRM",  # Salesforce
+        "NFLX",  # Netflix
+        "AMD",  # AMD
+        "INTC",  # Intel
+        "DIS",  # Disney
+        "BAC",  # Bank of America
+        "JPM",  # JPMorgan Chase
+        "WFC",  # Wells Fargo
+        "GS",  # Goldman Sachs
+        "MS",  # Morgan Stanley
+        "VZ",  # Verizon
+        "T",  # AT&T
+        "CMCSA",  # Comcast
+        "NKE",  # Nike
+        "SBUX",  # Starbucks
+        "LLY",  # Eli Lilly
+        "PFE",  # Pfizer
+        "XOM",  # Exxon Mobil
+        "COP",  # ConocoPhillips
+        "ORCL",  # Oracle
+        "IBM",  # IBM
+        "QCOM",  # Qualcomm
+        "TXN",  # Texas Instruments
+        "AVGO",  # Broadcom
+        "INTU",  # Intuit
     ]
+
+    TRACKED_TICKER_NAMES = {
+        "AAPL": "Apple",
+        "MSFT": "Microsoft",
+        "GOOGL": "Google",
+        "AMZN": "Amazon",
+        "NVDA": "Nvidia",
+        "META": "Meta",
+        "BRK.B": "Berkshire",
+        "TSLA": "Tesla",
+        "UNH": "UnitedHealth",
+        "JNJ": "Johnson & Johnson",
+        "V": "Visa",
+        "MA": "Mastercard",
+        "PG": "Procter & Gamble",
+        "HD": "Home Depot",
+        "CVX": "Chevron",
+        "MRK": "Merck",
+        "ABBV": "AbbVie",
+        "PEP": "PepsiCo",
+        "KO": "Coca-Cola",
+        "COST": "Costco",
+        "WMT": "Walmart",
+        "MCD": "McDonald's",
+        "CSCO": "Cisco",
+        "ACN": "Accenture",
+        "ADBE": "Adobe",
+        "CRM": "Salesforce",
+        "NFLX": "Netflix",
+        "AMD": "AMD",
+        "INTC": "Intel",
+        "DIS": "Disney",
+        "BAC": "Bank of America",
+        "JPM": "JPMorgan Chase",
+        "WFC": "Wells Fargo",
+        "GS": "Goldman Sachs",
+        "MS": "Morgan Stanley",
+        "VZ": "Verizon",
+        "T": "AT&T",
+        "CMCSA": "Comcast",
+        "NKE": "Nike",
+        "SBUX": "Starbucks",
+        "LLY": "Eli Lilly",
+        "PFE": "Pfizer",
+        "XOM": "Exxon Mobil",
+        "COP": "ConocoPhillips",
+        "ORCL": "Oracle",
+        "IBM": "IBM",
+        "QCOM": "Qualcomm",
+        "TXN": "Texas Instruments",
+        "AVGO": "Broadcom",
+        "INTU": "Intuit",
+    }
+
+    # Backward-compatible alias
+    TOP_COMPANIES = TRACKED_TICKERS
 
     def __init__(self, api_key: str):
         """Initialize StockData with API key."""
@@ -147,7 +243,7 @@ class StockDataManager:
     def print_stock_data(self) -> None:
         """Print formatted stock data."""
         all_data = self.get_all_data()
-        print("\nTop 10 Companies Stock Data:")
+        print("\nTracked Companies Stock Data:")
         print("---------------------------")
         for ticker, info in all_data.items():
             change = info.close_price - info.open_price
