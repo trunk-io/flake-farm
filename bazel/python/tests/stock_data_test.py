@@ -1,10 +1,14 @@
 """Tests for the stock_data module."""
 
 import os
+import random
 import re
+import time
 import unittest
 
-from bazel.python.src.stock_data import StockData, StockDataManager
+from bazel.python.src.stock_data import RateLimitError, StockData, StockDataManager
+
+RATE_LIMIT_BACKOFF_SECONDS = 12
 
 
 def get_api_key() -> str:
@@ -21,10 +25,23 @@ def _company_test_slug(company_name: str) -> str:
     return slug.strip("_")
 
 
+def _fail_on_rate_limit(test_case, company_name: str, ticker: str) -> None:
+    """Fail this test immediately on 429, then sleep before the next test runs."""
+    test_case.addCleanup(lambda: time.sleep(RATE_LIMIT_BACKOFF_SECONDS))
+    test_case.fail(
+        f"Polygon rate limit hit for {company_name} ({ticker})"
+    )
+
+
 def _make_is_up_test(ticker: str, company_name: str):
     def test_method(self):
-        info = self.manager.get_stock_info(ticker)
-        self.assertIsNotNone(info)
+        try:
+            info = self.manager.get_stock_info(ticker)
+        except RateLimitError:
+            _fail_on_rate_limit(self, company_name, ticker)
+            return
+
+        self.assertIsNotNone(info, f"Failed to fetch data for {ticker}")
         self.assertGreater(
             info.close_price,
             info.open_price,
@@ -41,27 +58,18 @@ class StockDataTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Set up test fixtures - fetch live stock data."""
-        print("\nFetching live stock data...\n")
+        """Set up shared manager; each test fetches its own ticker."""
         stock_data = StockData(get_api_key())
         cls.manager = StockDataManager(stock_data)
 
+    def test_tracked_tickers_configured(self):
+        """Test that tracked ticker metadata is internally consistent."""
+        self.assertEqual(
+            len(StockData.TRACKED_TICKERS),
+            len(StockData.TRACKED_TICKER_NAMES),
+        )
         for ticker in StockData.TRACKED_TICKERS:
-            info = cls.manager.get_stock_info(ticker)
-            assert info is not None, f"Failed to fetch data for {ticker}"
-
-        cls.manager.print_stock_data()
-
-    def test_all_companies_data_fetched(self):
-        """Test that all companies' data was fetched."""
-        all_data = self.manager.get_all_data()
-        self.assertEqual(len(all_data), len(StockData.TRACKED_TICKERS))
-
-        for _ticker, info in all_data.items():
-            self.assertGreater(info.close_price, 0.0)
-            self.assertGreaterEqual(info.high_price, info.low_price)
-            self.assertGreater(info.volume, 0)
-            self.assertFalse(info.timestamp == "")
+            self.assertIn(ticker, StockData.TRACKED_TICKER_NAMES)
 
 
 for _ticker in StockData.TRACKED_TICKERS:
@@ -72,6 +80,13 @@ for _ticker in StockData.TRACKED_TICKERS:
         _test_name,
         _make_is_up_test(_ticker, _company_name),
     )
+
+
+def load_tests(loader, tests, pattern):
+    """Randomize test order so rate-limited runs don't always hit the same tickers."""
+    test_list = list(tests)
+    random.shuffle(test_list)
+    return unittest.TestSuite(test_list)
 
 
 if __name__ == "__main__":

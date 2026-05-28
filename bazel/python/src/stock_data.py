@@ -9,6 +9,14 @@ from datetime import datetime
 from typing import Dict, Optional
 
 
+class RateLimitError(Exception):
+    """Raised when Polygon.io returns HTTP 429."""
+
+    def __init__(self, ticker: str):
+        self.ticker = ticker
+        super().__init__(f"Polygon rate limit hit for {ticker}")
+
+
 @dataclass
 class StockInfo:
     """Stock information data structure."""
@@ -144,7 +152,6 @@ class StockData:
         """Get stock info for a ticker, fetching if not cached."""
         if ticker in self.stock_data:
             return self.stock_data[ticker]
-        # Not in cache, enforce rate limit and fetch
         if self._fetch_ticker_data(ticker):
             return self.stock_data[ticker]
         return None
@@ -162,25 +169,19 @@ class StockData:
 
         try:
             with urllib.request.urlopen(url) as response:
-                http_code = response.getcode()
-                if http_code == 429:
-                    print(f"Rate limit hit for {ticker}, waiting 12 seconds...")
-                    time.sleep(12)
-                    # Try again
-                    return self._fetch_ticker_data(ticker)
+                if response.getcode() == 429:
+                    raise RateLimitError(ticker)
 
-                # Record this API call
                 self.api_call_times.append(time.time())
-
                 print(f"Got data for {ticker}")
 
                 response_data = response.read().decode("utf-8")
                 return self._parse_json_response(response_data, ticker)
+        except RateLimitError:
+            raise
         except urllib.error.HTTPError as e:
             if e.code == 429:
-                print(f"Rate limit hit for {ticker}, waiting 12 seconds...")
-                time.sleep(12)
-                return self._fetch_ticker_data(ticker)
+                raise RateLimitError(ticker) from e
             return False
         except Exception:
             return False
