@@ -150,6 +150,21 @@ namespace ItsAlwaysSunnyOnEarth
 
                 bool isCalm = await IsCalmInCity(city); // Default threshold 5.0
                 Console.WriteLine(isCalm ? $"It's CALM in {city} (wind < 5 km/h)." : $"It's WINDY in {city} (wind >= 5 km/h).");
+
+                bool isRaining = await IsRainingInCity(city);
+                Console.WriteLine(isRaining ? $"It's RAINING in {city}." : $"It's NOT RAINING in {city}.");
+
+                bool isSnowing = await IsSnowingInCity(city);
+                Console.WriteLine(isSnowing ? $"It's SNOWING in {city}." : $"It's NOT SNOWING in {city}.");
+
+                bool isFoggy = await IsFoggyInCity(city);
+                Console.WriteLine(isFoggy ? $"It's FOGGY in {city}." : $"It's NOT FOGGY in {city}.");
+
+                bool isTooCold = await IsTooColdInCity(city);
+                Console.WriteLine(isTooCold ? $"It's TOO COLD in {city} (<= 55°F)." : $"It's NOT TOO COLD in {city} (> 55°F).");
+
+                bool isTooHot = await IsTooHotInCity(city);
+                Console.WriteLine(isTooHot ? $"It's TOO HOT in {city} (>= 75°F)." : $"It's NOT TOO HOT in {city} (< 75°F).");
             }
         }
 
@@ -163,7 +178,7 @@ namespace ItsAlwaysSunnyOnEarth
 
             double latitude = coords.Latitude;
             double longitude = coords.Longitude;
-            string apiUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude:0.00}&longitude={longitude:0.00}&current_weather=true";
+            string apiUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude:0.00}&longitude={longitude:0.00}&current_weather=true&temperature_unit=fahrenheit";
 
             using (HttpClient client = new HttpClient())
             {
@@ -199,7 +214,7 @@ namespace ItsAlwaysSunnyOnEarth
             CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
             if (currentWeather != null)
             {
-                // WMO Weather interpretation codes: 3, 45, 48 indicate cloudy/foggy conditions.
+                // WMO Weather interpretation codes: 3 (overcast), 45/48 (fog) indicate poor visibility.
                 // Reference: https://open-meteo.com/en/docs (Weather variable: weather_code)
                 Console.WriteLine($"Cloud check for {cityName}: Weather code {currentWeather.WeatherCode}");
                 return currentWeather.WeatherCode == 3 || currentWeather.WeatherCode == 45 || currentWeather.WeatherCode == 48;
@@ -227,6 +242,85 @@ namespace ItsAlwaysSunnyOnEarth
                 return currentWeather.Windspeed < windSpeedThreshold;
             }
             return false; // Default to false (e.g., interpret as windy) if data unavailable
+        }
+
+        public static async Task<bool> IsRainingInCity(string cityName)
+        {
+            CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
+            if (currentWeather != null)
+            {
+                // WMO Weather interpretation codes for drizzle, rain, showers, and thunderstorms.
+                // Reference: https://open-meteo.com/en/docs (Weather variable: weather_code)
+                Console.WriteLine($"Rain check for {cityName}: Weather code {currentWeather.WeatherCode}");
+                return IsRainWeatherCode(currentWeather.WeatherCode);
+            }
+            return false; // Default to false if weather data couldn't be retrieved
+        }
+
+        private static bool IsRainWeatherCode(int weatherCode)
+        {
+            return weatherCode is 51 or 53 or 55 or 56 or 57
+                or 61 or 63 or 65 or 66 or 67
+                or 80 or 81 or 82
+                or 95 or 96 or 99;
+        }
+
+        public static async Task<bool> IsSnowingInCity(string cityName)
+        {
+            CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
+            if (currentWeather != null)
+            {
+                // WMO Weather interpretation codes for snow fall and snow showers.
+                // Reference: https://open-meteo.com/en/docs (Weather variable: weather_code)
+                Console.WriteLine($"Snow check for {cityName}: Weather code {currentWeather.WeatherCode}");
+                return IsSnowWeatherCode(currentWeather.WeatherCode);
+            }
+            return false; // Default to false if weather data couldn't be retrieved
+        }
+
+        private static bool IsSnowWeatherCode(int weatherCode)
+        {
+            return weatherCode is 71 or 73 or 75 or 77 or 85 or 86;
+        }
+
+        public static async Task<bool> IsFoggyInCity(string cityName)
+        {
+            CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
+            if (currentWeather != null)
+            {
+                // WMO Weather interpretation codes for fog and depositing rime fog.
+                // Reference: https://open-meteo.com/en/docs (Weather variable: weather_code)
+                Console.WriteLine($"Fog check for {cityName}: Weather code {currentWeather.WeatherCode}");
+                return IsFogWeatherCode(currentWeather.WeatherCode);
+            }
+            return false; // Default to false if weather data couldn't be retrieved
+        }
+
+        private static bool IsFogWeatherCode(int weatherCode)
+        {
+            return weatherCode is 45 or 48;
+        }
+
+        public static async Task<bool> IsTooColdInCity(string cityName, double minFahrenheit = 55.0)
+        {
+            CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
+            if (currentWeather != null)
+            {
+                Console.WriteLine($"Cold check for {cityName}: Temperature {currentWeather.Temperature}°F");
+                return currentWeather.Temperature <= minFahrenheit;
+            }
+            return false;
+        }
+
+        public static async Task<bool> IsTooHotInCity(string cityName, double maxFahrenheit = 75.0)
+        {
+            CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
+            if (currentWeather != null)
+            {
+                Console.WriteLine($"Hot check for {cityName}: Temperature {currentWeather.Temperature}°F");
+                return currentWeather.Temperature >= maxFahrenheit;
+            }
+            return false;
         }
     }
 
