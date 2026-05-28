@@ -25,22 +25,9 @@ def _company_test_slug(company_name: str) -> str:
     return slug.strip("_")
 
 
-def _fail_on_rate_limit(test_case, company_name: str, ticker: str) -> None:
-    """Fail this test immediately on 429, then sleep before the next test runs."""
-    test_case.addCleanup(lambda: time.sleep(RATE_LIMIT_BACKOFF_SECONDS))
-    test_case.fail(
-        f"Polygon rate limit hit for {company_name} ({ticker})"
-    )
-
-
 def _make_is_up_test(ticker: str, company_name: str):
     def test_method(self):
-        try:
-            info = self.manager.get_stock_info(ticker)
-        except RateLimitError:
-            _fail_on_rate_limit(self, company_name, ticker)
-            return
-
+        info = self.manager.get_stock_info(ticker)
         self.assertIsNotNone(info, f"Failed to fetch data for {ticker}")
         self.assertGreater(
             info.close_price,
@@ -58,9 +45,22 @@ class StockDataTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Set up shared manager; each test fetches its own ticker."""
+        """Load all tracked tickers in one batched Polygon API call."""
         stock_data = StockData(get_api_key())
         cls.manager = StockDataManager(stock_data)
+        try:
+            cls.manager.load_tracked_tickers()
+        except RateLimitError:
+            time.sleep(RATE_LIMIT_BACKOFF_SECONDS)
+            cls._rate_limited = True
+            return
+        cls._rate_limited = False
+
+    def setUp(self):
+        if getattr(self.__class__, "_rate_limited", False):
+            self.fail(
+                "Polygon rate limit hit while fetching grouped daily bars"
+            )
 
     def test_tracked_tickers_configured(self):
         """Test that tracked ticker metadata is internally consistent."""
