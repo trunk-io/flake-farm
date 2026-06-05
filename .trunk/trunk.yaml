@@ -24,7 +24,8 @@ runtimes:
 lint:
   enabled:
     - grype@0.114.0
-    - pinact@4.0.0
+    - pinact@4.0.0:
+        commands: [lint, upgrade]
     - actionlint@1.7.12
     - bandit@1.9.4
     - black@26.5.1
