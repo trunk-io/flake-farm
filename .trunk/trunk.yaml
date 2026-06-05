@@ -2,7 +2,7 @@
 # To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
 version: 0.1
 cli:
-  version: 1.24.1-beta.3
+  version: 1.25.0
   shell_hooks:
     enforce: true
 
@@ -10,7 +10,7 @@ plugins:
   sources:
     - id: trunk
       uri: https://github.com/trunk-io/plugins
-      ref: v1.7.0
+      ref: v1.10.2
 
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
 runtimes:
@@ -18,33 +18,35 @@ runtimes:
     - go@1.21.0
     - java@13.0.11
     - node@=22.16.0
-    - python@3.10.8
+    - python@3.14.4
     - ruby@>=3.4.7
 
 lint:
   enabled:
-    - actionlint@1.7.7
-    - bandit@1.8.3
-    - black@25.1.0
-    - buildifier@8.2.0
-    - checkov@3.2.435
+    - grype@0.114.0
+    - pinact@4.0.0
+    - actionlint@1.7.12
+    - bandit@1.9.4
+    - black@26.5.1
+    - buildifier@8.5.1
+    - checkov@3.2.533
     - clippy@1.65.0
     - git-diff-check
     - gofmt@1.20.4
-    - isort@6.0.1
-    - markdownlint@0.45.0
-    - osv-scanner@2.0.2
-    - prettier@3.5.3
-    - ruff@0.11.11
+    - isort@8.0.1
+    - markdownlint@0.48.0
+    - osv-scanner@2.3.8
+    - prettier@3.8.3
+    - ruff@0.15.16
     - rustfmt@1.65.0
-    - shellcheck@0.10.0
+    - shellcheck@0.11.0
     - shfmt@3.6.0
-    - taplo@0.9.3
-    - trufflehog@3.88.34
-    - yamllint@1.37.1
-    - golangci-lint2@2.1.6
-    - ktlint@1.6.0
-    - eslint@9.27.0
+    - taplo@0.10.0
+    - trufflehog@3.95.5
+    - yamllint@1.38.0
+    - golangci-lint2@2.12.2
+    - ktlint@1.8.0
+    - eslint@10.4.1
   disabled:
     - rubocop
   ignore:
@@ -65,6 +67,6 @@ tools:
     # - node
     - python
   enabled:
-    - bazel@8.2.1
-    - gh@2.74.0
-    - pnpm@10.11.0
+    - bazel@9.1.1
+    - gh@2.93.0
+    - pnpm@11.5.2
