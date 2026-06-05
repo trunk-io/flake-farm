@@ -11,22 +11,57 @@ jobs:
   bazel_test:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        backend:
+          - local
+          - buildbuddy
+        bep_format:
+          - binary
+          - json
+
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3      - uses: actions/checkout@v4      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1      - uses: actions/checkout@v4
 
       - name: Setup Bazelisk
         uses: bazelbuild/setup-bazelisk@b39c379c82683a5f25d34f0d062761f62693e0b2 # v3.0.0        uses: bazelbuild/setup-bazelisk@v3
 
-      - name: Run tests
-        run: bazel test //bazel/gtest:hello_test --build_event_json_file=build_events.json
+      - name: Run tests (binary BEP)
+        if: matrix.bep_format == 'binary'
+        id: run_tests_binary
+        env:
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+        run: |
+          bazel test //bazel/python/tests:stock_data_test \
+            ${{ matrix.backend == 'buildbuddy' && '--config=buildbuddy' || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && format('--remote_header=x-buildbuddy-api-key={0}', secrets.BUILDBUDDY_API_KEY) || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && '--remote_download_regex=.*/test.xml' || '' }} \
+            --build_event_binary_file=bep.bin \
+            --nobuild_event_binary_file_path_conversion
         continue-on-error: true
 
-      - name: Upload results
-        # Run this step even if the test step ahead fails
+      - name: Run tests (JSON BEP)
+        if: matrix.bep_format == 'json'
+        id: run_tests_json
+        env:
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+        run: |
+          bazel test //bazel/python/tests:stock_data_test \
+            ${{ matrix.backend == 'buildbuddy' && '--config=buildbuddy' || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && format('--remote_header=x-buildbuddy-api-key={0}', secrets.BUILDBUDDY_API_KEY) || '' }} \
+            ${{ matrix.backend == 'buildbuddy' && '--remote_download_regex=.*/test.xml' || '' }} \
+            --build_event_json_file=build_events.json \
+            --nobuild_event_json_file_path_conversion
+        continue-on-error: true
+
+      - name: Process test results
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
-        continue-on-error: true
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
-          bazel-bep-path: build_events.json
-          org-slug: trunk
+          bazel-bep-path: ${{ matrix.bep_format == 'binary' && 'bep.bin' || 'build_events.json' }}
+          org-slug: ${{ vars.ORG_SLUG }}
           token: ${{ secrets.TRUNK_TOKEN }}
+          previous-step-outcome: ${{ matrix.bep_format == 'binary' && steps.run_tests_binary.outcome || steps.run_tests_json.outcome }}

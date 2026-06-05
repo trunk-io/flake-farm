@@ -25,22 +25,27 @@ jobs:
           ini-values: error_reporting=-1, display_errors=On
 
       - name: Run phpunit tests
+        id: run_tests
         run:
           phpunit -c php/phpunit/phpunit.xml --bootstrap php/phpunit/src/autoload.php --log-junit
           tests/phpunit_test.xml
+        continue-on-error: true
 
-      - name: Upload results
+      - name: Process test results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
         uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
           # Path to your test results.
           junit-paths: "**/*_test.xml"
           # Provide your Trunk organization slug.
-          org-slug: trunk
+          org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_TOKEN }}
-        continue-on-error: true
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.run_tests.outcome }}
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
