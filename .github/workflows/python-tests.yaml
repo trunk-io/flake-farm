@@ -54,6 +54,7 @@ jobs:
           variant: ${{ matrix.variant }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.pytest_tests.outcome }}
+          test-collection-short-id: 4hNhoz4T
 
       - name: Run robotframework tests
         id: robotframework_tests
@@ -80,6 +81,7 @@ jobs:
           variant: ${{ matrix.variant }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.robotframework_tests.outcome }}
+          test-collection-short-id: 4hNhoz4T
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
