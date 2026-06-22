@@ -12,6 +12,10 @@
 .cache
 default.profraw
 
+# C# / .NET
+**/bin/
+**/obj/
+
 # Python
 *.pyc
 

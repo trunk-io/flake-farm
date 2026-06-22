@@ -1,3 +1,7 @@
 # BuildBuddy remote build event streaming (use --config=buildbuddy to enable)
 build:buildbuddy --bes_results_url=https://app.buildbuddy.io/invocation/
 build:buildbuddy --bes_backend=grpcs://remote.buildbuddy.io
+
+# Forward Polygon API key from the shell into test sandboxes (stock_data_test)
+test --test_env=POLYGON_API_KEY
+

@@ -11,17 +11,115 @@ namespace ItsAlwaysSunnyOnEarth
     {
         private static readonly Dictionary<string, (double Latitude, double Longitude)> CityCoordinates = new()
         {
-            { "New York", (40.71, -74.01) },
-            { "London", (51.51, -0.13) },
-            { "Paris", (48.85, 2.35) },
-            { "Tokyo", (35.69, 139.69) },
+            { "Accra", (5.56, -0.19) },
+            { "Addis Ababa", (9.03, 38.74) },
+            { "Almaty", (43.24, 76.95) },
+            { "Amsterdam", (52.37, 4.90) },
+            { "Athens", (37.98, 23.73) },
+            { "Atlanta", (33.75, -84.39) },
+            { "Auckland", (-36.85, 174.76) },
+            { "Bangalore", (12.97, 77.59) },
+            { "Bangkok", (13.76, 100.50) },
+            { "Barcelona", (41.39, 2.17) },
             { "Beijing", (39.91, 116.40) },
-            { "Moscow", (55.75, 37.62) },
+            { "Berlin", (52.52, 13.41) },
+            { "Bogota", (4.71, -74.07) },
+            { "Boston", (42.36, -71.06) },
+            { "Brisbane", (-27.47, 153.03) },
+            { "Buenos Aires", (-34.60, -58.38) },
+            { "Budapest", (47.50, 19.04) },
             { "Cairo", (30.05, 31.23) },
-            { "Sydney", (-33.87, 151.21) },
+            { "Cape Town", (-33.92, 18.42) },
+            { "Casablanca", (33.57, -7.59) },
+            { "Chennai", (13.08, 80.27) },
+            { "Chicago", (41.88, -87.63) },
+            { "Copenhagen", (55.68, 12.57) },
+            { "Dakar", (14.72, -17.47) },
+            { "Dallas", (32.78, -96.80) },
+            { "Delhi", (28.61, 77.21) },
+            { "Denver", (39.74, -104.99) },
+            { "Dhaka", (23.81, 90.41) },
+            { "Doha", (25.29, 51.53) },
+            { "Dubai", (25.20, 55.27) },
+            { "Dublin", (53.35, -6.26) },
+            { "Guadalajara", (20.67, -103.35) },
+            { "Guangzhou", (23.13, 113.26) },
+            { "Hanoi", (21.03, 105.85) },
+            { "Havana", (23.11, -82.37) },
+            { "Helsinki", (60.17, 24.94) },
+            { "Ho Chi Minh City", (10.82, 106.63) },
+            { "Honolulu", (21.31, -157.86) },
+            { "Hong Kong", (22.32, 114.17) },
+            { "Houston", (29.76, -95.37) },
+            { "Hyderabad", (17.39, 78.49) },
+            { "Istanbul", (41.01, 28.98) },
+            { "Jakarta", (-6.21, 106.85) },
+            { "Johannesburg", (-26.20, 28.04) },
+            { "Karachi", (24.86, 67.01) },
+            { "Kinshasa", (-4.32, 15.31) },
+            { "Kolkata", (22.57, 88.36) },
+            { "Kuala Lumpur", (3.14, 101.69) },
+            { "Lagos", (6.52, 3.38) },
+            { "Lima", (-12.05, -77.04) },
+            { "Lisbon", (38.72, -9.14) },
+            { "London", (51.51, -0.13) },
+            { "Los Angeles", (34.05, -118.24) },
+            { "Luanda", (-8.84, 13.23) },
+            { "Madrid", (40.42, -3.70) },
+            { "Manila", (14.60, 120.98) },
+            { "Medellin", (6.25, -75.56) },
+            { "Melbourne", (-37.81, 144.96) },
+            { "Mexico City", (19.43, -99.13) },
+            { "Miami", (25.76, -80.19) },
+            { "Milan", (45.46, 9.19) },
+            { "Montevideo", (-34.90, -56.16) },
+            { "Montreal", (45.50, -73.57) },
+            { "Moscow", (55.75, 37.62) },
+            { "Mumbai", (19.08, 72.88) },
+            { "Munich", (48.14, 11.58) },
+            { "Nairobi", (1.29, 36.82) },
+            { "New York", (40.71, -74.01) },
+            { "Osaka", (34.69, 135.50) },
+            { "Paris", (48.85, 2.35) },
+            { "Perth", (-31.95, 115.86) },
+            { "Philadelphia", (39.95, -75.17) },
+            { "Phoenix", (33.45, -112.07) },
+            { "Prague", (50.08, 14.44) },
             { "Rio de Janeiro", (-22.91, -43.17) },
-            { "Berlin", (52.52, 13.41) }
+            { "Riyadh", (24.69, 46.72) },
+            { "Rome", (41.90, 12.50) },
+            { "San Diego", (32.72, -117.16) },
+            { "San Francisco", (37.77, -122.42) },
+            { "Santiago", (-33.45, -70.67) },
+            { "Sao Paulo", (-23.55, -46.63) },
+            { "Seattle", (47.61, -122.33) },
+            { "Seoul", (37.57, 126.98) },
+            { "Shanghai", (31.23, 121.47) },
+            { "Singapore", (1.35, 103.82) },
+            { "Stockholm", (59.33, 18.07) },
+            { "Sydney", (-33.87, 151.21) },
+            { "Taipei", (25.03, 121.57) },
+            { "Tashkent", (41.30, 69.28) },
+            { "Tehran", (35.69, 51.39) },
+            { "Tel Aviv", (32.09, 34.78) },
+            { "Tokyo", (35.69, 139.69) },
+            { "Toronto", (43.65, -79.38) },
+            { "Tunis", (36.81, 10.18) },
+            { "Vancouver", (49.28, -123.12) },
+            { "Vienna", (48.21, 16.37) },
+            { "Washington", (38.91, -77.04) },
+            { "Warsaw", (52.23, 21.01) },
+            { "Wellington", (-41.29, 174.78) },
+            { "Zurich", (47.37, 8.54) }
         };
+
+        public static IEnumerable<object[]> GetCityTestData()
+        {
+            foreach (var city in CityCoordinates.Keys)
+            {
+                yield return new object[] { city };
+            }
+        }
 
         // User-Agent for HTTP requests
         private const string UserAgent = "ItsAlwaysSunnyOnEarthApp/1.1 (github.com/your-repo/ItsAlwaysSunnyOnEarth)";
@@ -52,6 +150,21 @@ namespace ItsAlwaysSunnyOnEarth
 
                 bool isCalm = await IsCalmInCity(city); // Default threshold 5.0
                 Console.WriteLine(isCalm ? $"It's CALM in {city} (wind < 5 km/h)." : $"It's WINDY in {city} (wind >= 5 km/h).");
+
+                bool isRaining = await IsRainingInCity(city);
+                Console.WriteLine(isRaining ? $"It's RAINING in {city}." : $"It's NOT RAINING in {city}.");
+
+                bool isSnowing = await IsSnowingInCity(city);
+                Console.WriteLine(isSnowing ? $"It's SNOWING in {city}." : $"It's NOT SNOWING in {city}.");
+
+                bool isFoggy = await IsFoggyInCity(city);
+                Console.WriteLine(isFoggy ? $"It's FOGGY in {city}." : $"It's NOT FOGGY in {city}.");
+
+                bool isTooCold = await IsTooColdInCity(city);
+                Console.WriteLine(isTooCold ? $"It's TOO COLD in {city} (<= 55°F)." : $"It's NOT TOO COLD in {city} (> 55°F).");
+
+                bool isTooHot = await IsTooHotInCity(city);
+                Console.WriteLine(isTooHot ? $"It's TOO HOT in {city} (>= 75°F)." : $"It's NOT TOO HOT in {city} (< 75°F).");
             }
         }
 
@@ -65,7 +178,7 @@ namespace ItsAlwaysSunnyOnEarth
 
             double latitude = coords.Latitude;
             double longitude = coords.Longitude;
-            string apiUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude:0.00}&longitude={longitude:0.00}&current_weather=true";
+            string apiUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude:0.00}&longitude={longitude:0.00}&current_weather=true&temperature_unit=fahrenheit";
 
             using (HttpClient client = new HttpClient())
             {
@@ -101,7 +214,7 @@ namespace ItsAlwaysSunnyOnEarth
             CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
             if (currentWeather != null)
             {
-                // WMO Weather interpretation codes: 3, 45, 48 indicate cloudy/foggy conditions.
+                // WMO Weather interpretation codes: 3 (overcast), 45/48 (fog) indicate poor visibility.
                 // Reference: https://open-meteo.com/en/docs (Weather variable: weather_code)
                 Console.WriteLine($"Cloud check for {cityName}: Weather code {currentWeather.WeatherCode}");
                 return currentWeather.WeatherCode == 3 || currentWeather.WeatherCode == 45 || currentWeather.WeatherCode == 48;
@@ -129,6 +242,85 @@ namespace ItsAlwaysSunnyOnEarth
                 return currentWeather.Windspeed < windSpeedThreshold;
             }
             return false; // Default to false (e.g., interpret as windy) if data unavailable
+        }
+
+        public static async Task<bool> IsRainingInCity(string cityName)
+        {
+            CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
+            if (currentWeather != null)
+            {
+                // WMO Weather interpretation codes for drizzle, rain, showers, and thunderstorms.
+                // Reference: https://open-meteo.com/en/docs (Weather variable: weather_code)
+                Console.WriteLine($"Rain check for {cityName}: Weather code {currentWeather.WeatherCode}");
+                return IsRainWeatherCode(currentWeather.WeatherCode);
+            }
+            return false; // Default to false if weather data couldn't be retrieved
+        }
+
+        private static bool IsRainWeatherCode(int weatherCode)
+        {
+            return weatherCode is 51 or 53 or 55 or 56 or 57
+                or 61 or 63 or 65 or 66 or 67
+                or 80 or 81 or 82
+                or 95 or 96 or 99;
+        }
+
+        public static async Task<bool> IsSnowingInCity(string cityName)
+        {
+            CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
+            if (currentWeather != null)
+            {
+                // WMO Weather interpretation codes for snow fall and snow showers.
+                // Reference: https://open-meteo.com/en/docs (Weather variable: weather_code)
+                Console.WriteLine($"Snow check for {cityName}: Weather code {currentWeather.WeatherCode}");
+                return IsSnowWeatherCode(currentWeather.WeatherCode);
+            }
+            return false; // Default to false if weather data couldn't be retrieved
+        }
+
+        private static bool IsSnowWeatherCode(int weatherCode)
+        {
+            return weatherCode is 71 or 73 or 75 or 77 or 85 or 86;
+        }
+
+        public static async Task<bool> IsFoggyInCity(string cityName)
+        {
+            CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
+            if (currentWeather != null)
+            {
+                // WMO Weather interpretation codes for fog and depositing rime fog.
+                // Reference: https://open-meteo.com/en/docs (Weather variable: weather_code)
+                Console.WriteLine($"Fog check for {cityName}: Weather code {currentWeather.WeatherCode}");
+                return IsFogWeatherCode(currentWeather.WeatherCode);
+            }
+            return false; // Default to false if weather data couldn't be retrieved
+        }
+
+        private static bool IsFogWeatherCode(int weatherCode)
+        {
+            return weatherCode is 45 or 48;
+        }
+
+        public static async Task<bool> IsTooColdInCity(string cityName, double minFahrenheit = 55.0)
+        {
+            CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
+            if (currentWeather != null)
+            {
+                Console.WriteLine($"Cold check for {cityName}: Temperature {currentWeather.Temperature}°F");
+                return currentWeather.Temperature <= minFahrenheit;
+            }
+            return false;
+        }
+
+        public static async Task<bool> IsTooHotInCity(string cityName, double maxFahrenheit = 75.0)
+        {
+            CurrentWeather? currentWeather = await GetCurrentWeatherAsync(cityName);
+            if (currentWeather != null)
+            {
+                Console.WriteLine($"Hot check for {cityName}: Temperature {currentWeather.Temperature}°F");
+                return currentWeather.Temperature >= maxFahrenheit;
+            }
+            return false;
         }
     }
 
