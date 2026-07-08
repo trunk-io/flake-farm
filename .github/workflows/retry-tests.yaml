@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3      - uses: actions/checkout@v4      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: set up python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0        uses: actions/setup-python@v5        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: 3.x
 
@@ -22,14 +22,14 @@ jobs:
           pip install -r requirements.txt
 
       - name: trunk install
-        uses: trunk-io/trunk-action/install@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1        uses: trunk-io/trunk-action/install@v1.1.16        uses: trunk-io/trunk-action/install@86b68ffae610a05105e90b1f52ad8c549ef482c2 # v1.1.16        uses: trunk-io/trunk-action/install@v1.1.16
+        uses: trunk-io/trunk-action/install@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1
         with:
           tools: gh
 
       - name: download artifact (when retrying)
         if: ${{ fromJSON(github.run_attempt) > 1}}
         id: download-artifact
-        uses: dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151 # v21        uses: dawidd6/action-download-artifact@v6        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151 # v21
         with:
           pr: ${{github.event.pull_request.number}}
           name: retry-data
@@ -61,7 +61,7 @@ jobs:
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1        uses: actions/upload-artifact@v4        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: retry-behave-junit-results
           path: "**/python/results/*-behave.xml"
@@ -69,7 +69,7 @@ jobs:
 
       - name: upload artifacts
         if: ${{ failure() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1        uses: actions/upload-artifact@v4        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: retry-data
           path: "**/python/behave/retry.data"
