@@ -46,7 +46,7 @@ jobs:
           token: ${{ secrets.TRUNK_TOKEN }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.run_tests.outcome }}
-          test-collection-id: Qvu4CYQ1
+          test-collection-id: eEMCRlz4
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
