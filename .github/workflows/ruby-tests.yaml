@@ -34,6 +34,14 @@ jobs:
         if: ${{ inputs.rspec_trunk_flaky_tests_version }}
         run: bundle install
 
+      - name: Optionally pin pre-release trunk rspec gem
+        if: vars.RSPEC_PRE_RELEASE_TEST_VERSION != '' && vars.RSPEC_PRE_RELEASE_TEST_VERSION != 'latest'
+        run: |
+          VERSION='${{ vars.RSPEC_PRE_RELEASE_TEST_VERSION }}'
+          sed -i "s/^gem 'rspec_trunk_flaky_tests'.*/gem 'rspec_trunk_flaky_tests', '= ${VERSION}'/" Gemfile
+          bundle config set --local frozen false
+          bundle install
+
       # this is the recommended way to run rspec tests using the trunk rspec plugin
       - name: Run rspec tests (with trunk rspec plugin)
         id: rspec_trunk_tests
@@ -59,6 +67,7 @@ jobs:
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
+          cli-version: ${{ vars.ANALYTICS_CLI_PRE_RELEASE_TEST_VERSION }}
           # Path to your test results.
           junit-paths: "**/rspec_test.xml"
           # Provide your Trunk organization slug.
@@ -82,6 +91,7 @@ jobs:
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
+          cli-version: ${{ vars.ANALYTICS_CLI_PRE_RELEASE_TEST_VERSION }}
           # Path to your test results.
           junit-paths: "**/ruby/minitest/results/*.xml"
           # Provide your Trunk organization slug.

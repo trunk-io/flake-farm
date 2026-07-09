@@ -44,6 +44,7 @@ jobs:
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
+          cli-version: ${{ vars.ANALYTICS_CLI_PRE_RELEASE_TEST_VERSION }}
           # Path to your test results.
           junit-paths: python/results/pytest/pytest_test.xml
           # Provide your Trunk organization slug.
@@ -71,6 +72,7 @@ jobs:
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
+          cli-version: ${{ vars.ANALYTICS_CLI_PRE_RELEASE_TEST_VERSION }}
           # Path to your test results.
           junit-paths: python/results/robotframework/robot_test.xml
           # Provide your Trunk organization slug.
