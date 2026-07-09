@@ -6,6 +6,9 @@ set -euo pipefail
 
 REPO="trunk-io/analytics-cli"
 
+# Optional pre-release version to smoke-test ("" or "latest" = latest release).
+VERSION="${1:-}"
+
 # Normalize OS/arch to match launcher script platform naming
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')" # linux | darwin
 ARCH="$(uname -m)"
@@ -35,7 +38,11 @@ else
 fi
 
 ASSET="trunk-analytics-cli-${PLATFORM}.tar.gz"
-URL="https://github.com/${REPO}/releases/latest/download/${ASSET}"
+if [[ -n ${VERSION} && ${VERSION} != "latest" ]]; then
+	URL="https://github.com/${REPO}/releases/download/${VERSION}/${ASSET}"
+else
+	URL="https://github.com/${REPO}/releases/latest/download/${ASSET}"
+fi
 
 echo "Downloading and installing ${ASSET}…"
 curl -fL --retry 3 "${URL}" | tar -xz

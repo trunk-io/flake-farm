@@ -63,6 +63,7 @@ jobs:
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
+          cli-version: ${{ vars.ANALYTICS_CLI_PRE_RELEASE_TEST_VERSION }}
           bazel-bep-path: ${{ matrix.bep_format == 'binary' && 'bep.bin' || 'build_events.json' }}
           use-bazel-target-for-codeowners: true
           org-slug: ${{ vars.ORG_SLUG }}
