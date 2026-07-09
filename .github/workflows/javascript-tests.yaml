@@ -49,7 +49,7 @@ jobs:
           token: ${{ secrets.TRUNK_TOKEN }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.mocha_tests.outcome }}
-          test-collection-id: 2gyJClZi
+          test-collection-id: 5fheimOf
 
       - name: Run Jest Tests
         id: jest_tests
@@ -71,7 +71,7 @@ jobs:
           token: ${{ secrets.TRUNK_TOKEN }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.jest_tests.outcome }}
-          test-collection-id: 2gyJClZi
+          test-collection-id: 5fheimOf
 
       - name: Run Jasmine Tests
         id: jasmine_tests
@@ -93,7 +93,7 @@ jobs:
           token: ${{ secrets.TRUNK_TOKEN }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.jasmine_tests.outcome }}
-          test-collection-id: 2gyJClZi
+          test-collection-id: 5fheimOf
 
       - name: Run Playwright Tests
         id: playwright_tests
@@ -115,7 +115,7 @@ jobs:
           token: ${{ secrets.TRUNK_TOKEN }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.playwright_tests.outcome }}
-          test-collection-id: 2gyJClZi
+          test-collection-id: 5fheimOf
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
