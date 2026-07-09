@@ -22,7 +22,7 @@ jobs:
         run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
       - name: Install trunk-analytics-cli
-        run: bash get-trunk-cli
+        run: bash get-trunk-cli "${{ vars.ANALYTICS_CLI_PRE_RELEASE_TEST_VERSION }}"
 
       - name: Run rust tests
         id: run_tests
