@@ -53,6 +53,7 @@ jobs:
           test-collection-id: 5fheimOf
 
       - name: Run Jest Tests
+        if: ${{ always() }}
         id: jest_tests
         run: npm run jest-test
         continue-on-error: true
@@ -76,6 +77,7 @@ jobs:
           test-collection-id: 5fheimOf
 
       - name: Run Jasmine Tests
+        if: ${{ always() }}
         id: jasmine_tests
         run: npm run jasmine-test
         continue-on-error: true
@@ -99,6 +101,7 @@ jobs:
           test-collection-id: 5fheimOf
 
       - name: Run Playwright Tests
+        if: ${{ always() }}
         id: playwright_tests
         run: npm run playwright-test
         continue-on-error: true
