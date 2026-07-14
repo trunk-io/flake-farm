@@ -7,7 +7,6 @@ import sys
 import time
 import traceback
 import unittest
-import xml.etree.ElementTree as ET
 
 from bazel.python.src.stock_data import RateLimitError, StockData, StockDataManager
 
@@ -141,44 +140,63 @@ def _summary_line(message: str) -> str:
     return ""
 
 
+def _xml_escape(text: str) -> str:
+    """Escape a string for use in XML text or double-quoted attribute values."""
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
+
+
 def _write_junit_xml(
     output_path: str, result: _RecordingResult, total_time: float
 ) -> None:
-    """Write one <testcase> per ticker so Bazel/Trunk track each ticker as a distinct test."""
+    """Write one <testcase> per ticker so Bazel/Trunk track each ticker as a distinct test.
+
+    Built as a plain string (no XML parser is involved) since we only emit trusted output.
+    """
     outcomes = [outcome for _, outcome, _, _, _ in result.records]
-    testsuites = ET.Element("testsuites")
-    testsuite = ET.SubElement(
-        testsuites,
-        "testsuite",
-        {
-            "name": "StockDataTest",
-            "tests": str(len(result.records)),
-            "failures": str(outcomes.count("failure")),
-            "errors": str(outcomes.count("error")),
-            "skipped": str(outcomes.count("skipped")),
-            "time": f"{total_time:.3f}",
-        },
+    lines = ['<?xml version="1.0" encoding="utf-8"?>']
+    lines.append(
+        '<testsuites><testsuite name="StockDataTest" '
+        f'tests="{len(result.records)}" '
+        f'failures="{outcomes.count("failure")}" '
+        f'errors="{outcomes.count("error")}" '
+        f'skipped="{outcomes.count("skipped")}" '
+        f'time="{total_time:.3f}">'
     )
 
     for test, outcome, exc_type, message, elapsed in result.records:
-        test_id = test.id()
-        classname, _, name = test_id.rpartition(".")
-        testcase = ET.SubElement(
-            testsuite,
-            "testcase",
-            {"name": name, "classname": classname, "time": f"{elapsed:.3f}"},
+        classname, _, name = test.id().rpartition(".")
+        attrs = (
+            f'name="{_xml_escape(name)}" '
+            f'classname="{_xml_escape(classname)}" '
+            f'time="{elapsed:.3f}"'
         )
         if outcome in ("failure", "error"):
-            node = ET.SubElement(
-                testcase, outcome, {"message": _summary_line(message), "type": exc_type}
+            lines.append(f"  <testcase {attrs}>")
+            lines.append(
+                f"    <{outcome} "
+                f'message="{_xml_escape(_summary_line(message))}" '
+                f'type="{_xml_escape(exc_type)}">'
+                f"{_xml_escape(message)}</{outcome}>"
             )
-            node.text = message
+            lines.append("  </testcase>")
         elif outcome == "skipped":
-            ET.SubElement(testcase, "skipped", {"message": message or ""})
+            lines.append(f"  <testcase {attrs}>")
+            lines.append(
+                f'    <skipped message="{_xml_escape(message or "")}"></skipped>'
+            )
+            lines.append("  </testcase>")
+        else:
+            lines.append(f"  <testcase {attrs}></testcase>")
 
-    tree = ET.ElementTree(testsuites)
-    ET.indent(tree)
-    tree.write(output_path, encoding="utf-8", xml_declaration=True)
+    lines.append("</testsuite></testsuites>")
+
+    with open(output_path, "w", encoding="utf-8") as handle:
+        handle.write("\n".join(lines) + "\n")
 
 
 def main() -> None:
