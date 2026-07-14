@@ -3,8 +3,11 @@
 import os
 import random
 import re
+import sys
 import time
+import traceback
 import unittest
+import xml.etree.ElementTree as ET
 
 from bazel.python.src.stock_data import RateLimitError, StockData, StockDataManager
 
@@ -58,9 +61,7 @@ class StockDataTest(unittest.TestCase):
 
     def setUp(self):
         if getattr(self.__class__, "_rate_limited", False):
-            self.fail(
-                "Polygon rate limit hit while fetching grouped daily bars"
-            )
+            self.fail("Polygon rate limit hit while fetching grouped daily bars")
 
     def test_tracked_tickers_configured(self):
         """Test that tracked ticker metadata is internally consistent."""
@@ -89,5 +90,117 @@ def load_tests(loader, tests, pattern):
     return unittest.TestSuite(test_list)
 
 
+class _RecordingResult(unittest.TestResult):
+    """Collects a per-test outcome so each ticker can be emitted as its own JUnit testcase."""
+
+    def __init__(self):
+        super().__init__()
+        self.records = []
+        self._start_times = {}
+
+    def startTest(self, test):
+        super().startTest(test)
+        self._start_times[test] = time.time()
+
+    def _elapsed(self, test):
+        return time.time() - self._start_times.get(test, time.time())
+
+    def addSuccess(self, test):
+        super().addSuccess(test)
+        self.records.append((test, "success", "", "", self._elapsed(test)))
+
+    def addFailure(self, test, err):
+        super().addFailure(test, err)
+        self.records.append(
+            (test, "failure", err[0].__name__, _format_err(err), self._elapsed(test))
+        )
+
+    def addError(self, test, err):
+        super().addError(test, err)
+        self.records.append(
+            (test, "error", err[0].__name__, _format_err(err), self._elapsed(test))
+        )
+
+    def addSkip(self, test, reason):
+        super().addSkip(test, reason)
+        self.records.append((test, "skipped", "", reason, self._elapsed(test)))
+
+
+def _format_err(err) -> str:
+    return "".join(traceback.format_exception(*err))
+
+
+def _summary_line(message: str) -> str:
+    """Return the final non-empty traceback line, i.e. the 'ExcType: message' summary."""
+    if not message:
+        return ""
+    for line in reversed(message.strip().splitlines()):
+        stripped = line.strip()
+        if stripped:
+            return stripped
+    return ""
+
+
+def _write_junit_xml(
+    output_path: str, result: _RecordingResult, total_time: float
+) -> None:
+    """Write one <testcase> per ticker so Bazel/Trunk track each ticker as a distinct test."""
+    outcomes = [outcome for _, outcome, _, _, _ in result.records]
+    testsuites = ET.Element("testsuites")
+    testsuite = ET.SubElement(
+        testsuites,
+        "testsuite",
+        {
+            "name": "StockDataTest",
+            "tests": str(len(result.records)),
+            "failures": str(outcomes.count("failure")),
+            "errors": str(outcomes.count("error")),
+            "skipped": str(outcomes.count("skipped")),
+            "time": f"{total_time:.3f}",
+        },
+    )
+
+    for test, outcome, exc_type, message, elapsed in result.records:
+        test_id = test.id()
+        classname, _, name = test_id.rpartition(".")
+        testcase = ET.SubElement(
+            testsuite,
+            "testcase",
+            {"name": name, "classname": classname, "time": f"{elapsed:.3f}"},
+        )
+        if outcome in ("failure", "error"):
+            node = ET.SubElement(
+                testcase, outcome, {"message": _summary_line(message), "type": exc_type}
+            )
+            node.text = message
+        elif outcome == "skipped":
+            ET.SubElement(testcase, "skipped", {"message": message or ""})
+
+    tree = ET.ElementTree(testsuites)
+    ET.indent(tree)
+    tree.write(output_path, encoding="utf-8", xml_declaration=True)
+
+
+def main() -> None:
+    # Bazel sets XML_OUTPUT_FILE and, when the test does not populate it, falls back
+    # to a single synthesized testcase for the whole target. Emit our own JUnit XML so
+    # every ticker surfaces as an individual test.
+    xml_output_file = os.environ.get("XML_OUTPUT_FILE")
+    if not xml_output_file:
+        unittest.main()
+        return
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(StockDataTest)
+    ordered = list(suite)
+    random.shuffle(ordered)
+
+    result = _RecordingResult()
+    started = time.time()
+    unittest.TestSuite(ordered).run(result)
+    _write_junit_xml(xml_output_file, result, time.time() - started)
+
+    sys.exit(0 if result.wasSuccessful() else 1)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    main()
