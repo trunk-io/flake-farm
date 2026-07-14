@@ -3,7 +3,9 @@
 import os
 import random
 import re
+import sys
 import time
+import traceback
 import unittest
 
 from bazel.python.src.stock_data import RateLimitError, StockData, StockDataManager
@@ -58,9 +60,7 @@ class StockDataTest(unittest.TestCase):
 
     def setUp(self):
         if getattr(self.__class__, "_rate_limited", False):
-            self.fail(
-                "Polygon rate limit hit while fetching grouped daily bars"
-            )
+            self.fail("Polygon rate limit hit while fetching grouped daily bars")
 
     def test_tracked_tickers_configured(self):
         """Test that tracked ticker metadata is internally consistent."""
@@ -89,5 +89,136 @@ def load_tests(loader, tests, pattern):
     return unittest.TestSuite(test_list)
 
 
+class _RecordingResult(unittest.TestResult):
+    """Collects a per-test outcome so each ticker can be emitted as its own JUnit testcase."""
+
+    def __init__(self):
+        super().__init__()
+        self.records = []
+        self._start_times = {}
+
+    def startTest(self, test):
+        super().startTest(test)
+        self._start_times[test] = time.time()
+
+    def _elapsed(self, test):
+        return time.time() - self._start_times.get(test, time.time())
+
+    def addSuccess(self, test):
+        super().addSuccess(test)
+        self.records.append((test, "success", "", "", self._elapsed(test)))
+
+    def addFailure(self, test, err):
+        super().addFailure(test, err)
+        self.records.append(
+            (test, "failure", err[0].__name__, _format_err(err), self._elapsed(test))
+        )
+
+    def addError(self, test, err):
+        super().addError(test, err)
+        self.records.append(
+            (test, "error", err[0].__name__, _format_err(err), self._elapsed(test))
+        )
+
+    def addSkip(self, test, reason):
+        super().addSkip(test, reason)
+        self.records.append((test, "skipped", "", reason, self._elapsed(test)))
+
+
+def _format_err(err) -> str:
+    return "".join(traceback.format_exception(*err))
+
+
+def _summary_line(message: str) -> str:
+    """Return the final non-empty traceback line, i.e. the 'ExcType: message' summary."""
+    if not message:
+        return ""
+    for line in reversed(message.strip().splitlines()):
+        stripped = line.strip()
+        if stripped:
+            return stripped
+    return ""
+
+
+def _xml_escape(text: str) -> str:
+    """Escape a string for use in XML text or double-quoted attribute values."""
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
+
+
+def _write_junit_xml(
+    output_path: str, result: _RecordingResult, total_time: float
+) -> None:
+    """Write one <testcase> per ticker so Bazel/Trunk track each ticker as a distinct test.
+
+    Built as a plain string (no XML parser is involved) since we only emit trusted output.
+    """
+    outcomes = [outcome for _, outcome, _, _, _ in result.records]
+    lines = ['<?xml version="1.0" encoding="utf-8"?>']
+    lines.append(
+        '<testsuites><testsuite name="StockDataTest" '
+        f'tests="{len(result.records)}" '
+        f'failures="{outcomes.count("failure")}" '
+        f'errors="{outcomes.count("error")}" '
+        f'skipped="{outcomes.count("skipped")}" '
+        f'time="{total_time:.3f}">'
+    )
+
+    for test, outcome, exc_type, message, elapsed in result.records:
+        classname, _, name = test.id().rpartition(".")
+        attrs = (
+            f'name="{_xml_escape(name)}" '
+            f'classname="{_xml_escape(classname)}" '
+            f'time="{elapsed:.3f}"'
+        )
+        if outcome in ("failure", "error"):
+            lines.append(f"  <testcase {attrs}>")
+            lines.append(
+                f"    <{outcome} "
+                f'message="{_xml_escape(_summary_line(message))}" '
+                f'type="{_xml_escape(exc_type)}">'
+                f"{_xml_escape(message)}</{outcome}>"
+            )
+            lines.append("  </testcase>")
+        elif outcome == "skipped":
+            lines.append(f"  <testcase {attrs}>")
+            lines.append(
+                f'    <skipped message="{_xml_escape(message or "")}"></skipped>'
+            )
+            lines.append("  </testcase>")
+        else:
+            lines.append(f"  <testcase {attrs}></testcase>")
+
+    lines.append("</testsuite></testsuites>")
+
+    with open(output_path, "w", encoding="utf-8") as handle:
+        handle.write("\n".join(lines) + "\n")
+
+
+def main() -> None:
+    # Bazel sets XML_OUTPUT_FILE and, when the test does not populate it, falls back
+    # to a single synthesized testcase for the whole target. Emit our own JUnit XML so
+    # every ticker surfaces as an individual test.
+    xml_output_file = os.environ.get("XML_OUTPUT_FILE")
+    if not xml_output_file:
+        unittest.main()
+        return
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(StockDataTest)
+    ordered = list(suite)
+    random.shuffle(ordered)
+
+    result = _RecordingResult()
+    started = time.time()
+    unittest.TestSuite(ordered).run(result)
+    _write_junit_xml(xml_output_file, result, time.time() - started)
+
+    sys.exit(0 if result.wasSuccessful() else 1)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    main()
