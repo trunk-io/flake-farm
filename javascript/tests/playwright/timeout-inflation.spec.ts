@@ -12,7 +12,7 @@ import { test, expect, type Page } from "@playwright/test";
  * Test timeouts on failure: Pacific 10s, Mountain 14s, Central 18s, Eastern 22s,
  * Alaska 28s, Hawaii 30s.
  */
-test.describe("time.gov timeout inflation", () => {
+test.describe("what time is it? (time.gov)", () => {
   test.describe.configure({ retries: 3 });
 
   test("Pacific hour is even", async ({ page }) => {
