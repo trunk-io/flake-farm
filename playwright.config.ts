@@ -25,10 +25,7 @@ export default defineConfig({
       "junit",
       {
         includeProjectInTestName: true,
-<<<<<<< Updated upstream
         includeRetries: true,
-=======
->>>>>>> Stashed changes
         outputFile: "tests/playwright/junitresults-playwright.xml",
       },
     ],
