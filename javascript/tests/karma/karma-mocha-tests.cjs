@@ -1,5 +1,5 @@
 // import assert from "assert";
-const assert = require('assert')
+const assert = require("assert");
 
 describe("Even - minute is divisible by 2", () => {
   it("should verify that the current minute is even", () => {

@@ -20,7 +20,3 @@ from the root dir
 ```
 phpunit -c php/phpunit/phpunit.xml --bootstrap php/phpunit/src/autoload.php --log-junit tests/phpunit_test.xml
 ```
-
-
-
-

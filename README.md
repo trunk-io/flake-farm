@@ -1,7 +1,6 @@
 <!-- markdownlint-disable first-line-heading -->
 <img width="750" height="750" alt="image" src="https://github.com/user-attachments/assets/5ee22177-5e5a-48ec-9ce7-0734d8ce60ab" />
 
-
 [![docs](https://img.shields.io/badge/-docs-darkgreen?logo=readthedocs&logoColor=ffffff)][docs]
 [![slack](https://img.shields.io/badge/-slack-611f69?logo=slack)][slack]
 
