@@ -37,7 +37,7 @@ jobs:
         run: |
           ./trunk-analytics-cli test \
             --org-url-slug ${{ vars.ORG_SLUG }} \
-            --test-collection-id eh3CZSJD \
+            --test-collection-id WwoHUss3 \
             --junit-paths "rust/**/nextest/ci/*junit.xml" \
             -- cargo nextest run --profile=ci --manifest-path=./rust/Cargo.toml
 

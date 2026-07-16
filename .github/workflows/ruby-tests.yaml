@@ -76,7 +76,7 @@ jobs:
           token: ${{ secrets.TRUNK_TOKEN }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.rspec_tests.outcome }}
-          test-collection-id: SrV9Xppx
+          test-collection-id: KtSNo9rY
 
       - name: Run minitest tests
         id: minitest_tests
@@ -100,7 +100,7 @@ jobs:
           token: ${{ secrets.TRUNK_TOKEN }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.minitest_tests.outcome }}
-          test-collection-id: SrV9Xppx
+          test-collection-id: KtSNo9rY
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}

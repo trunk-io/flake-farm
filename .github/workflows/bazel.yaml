@@ -69,4 +69,4 @@ jobs:
           org-slug: ${{ vars.ORG_SLUG }}
           token: ${{ secrets.TRUNK_TOKEN }}
           previous-step-outcome: ${{ matrix.bep_format == 'binary' && steps.run_tests_binary.outcome || steps.run_tests_json.outcome }}
-          test-collection-id: yYmFApb3
+          test-collection-id: PqhgoQw7
