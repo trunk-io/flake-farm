@@ -1,0 +1,63 @@
+name: Swift Tests
+
+on:
+  schedule:
+    - cron: 0 */6 * * *
+  pull_request: {}
+
+permissions:
+  contents: read
+
+jobs:
+  swift_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@7ca6abe6b3b0e8b5421b88be48feee39cbf52c6a # v2.4.0
+        with:
+          swift-version: 6.1.0
+
+      - name: Build
+        run: swift build
+        working-directory: apple/swift
+
+      # `--xunit-output apple/swift/test-results/swift_test.xml` does not write that
+      # path: SwiftPM writes one file per testing library and inserts the library
+      # name before the extension, so Swift Testing lands in
+      # `swift_test-swift-testing.xml`. The globs below match the suffixed name.
+      - name: Run swift tests
+        id: run_tests
+        run: |
+          mkdir -p test-results
+          swift test --xunit-output test-results/swift_test.xml
+        working-directory: apple/swift
+        continue-on-error: true
+
+      - name: Process test results
+        # Run this step even if the test step ahead fails
+        if: ${{ always() }}
+        uses: trunk-io/analytics-uploader@main
+        env:
+          TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
+        with:
+          cli-version: ${{ vars.ANALYTICS_CLI_PRE_RELEASE_TEST_VERSION }}
+          # Path to your test results.
+          junit-paths: apple/swift/test-results/*.xml
+          # Provide your Trunk organization slug.
+          org-slug: ${{ vars.ORG_SLUG }}
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_TOKEN }}
+          # Pass the test outcome for quarantining support
+          previous-step-outcome: ${{ steps.run_tests.outcome }}
+          test-collection-id: ifH29pof
+
+      - name: Upload JUnit XML artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: swift-junit-results
+          path: apple/swift/test-results/*.xml
+          retention-days: 7
