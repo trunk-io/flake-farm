@@ -10,10 +10,10 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - name: Checkout code
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3        uses: actions/checkout@v4        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: trunk install
-        uses: trunk-io/trunk-action/install@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1        uses: trunk-io/trunk-action/install@v1        uses: trunk-io/trunk-action/install@75699af9e26881e564e9d832ef7dc3af25ec031b # v1.2.4        uses: trunk-io/trunk-action/install@v1
+        uses: trunk-io/trunk-action/install@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1
         with:
           tools: gh
 
@@ -28,7 +28,7 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - name: Checkout code
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3        uses: actions/checkout@v4        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: main
 
@@ -54,7 +54,7 @@ jobs:
           echo "day=$(date +'%d')" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1        uses: peter-evans/create-pull-request@v6        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ secrets[steps.choose-next.outputs.secret_name] }}
           commit-message: Everyone knows its ${{ steps.switch.outputs.season }}
