@@ -37,7 +37,7 @@ jobs:
       - name: Process mocha results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@v2
+        uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
@@ -61,7 +61,7 @@ jobs:
       - name: Process jest results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@v2
+        uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
@@ -85,7 +85,7 @@ jobs:
       - name: Process jasmine results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@v2
+        uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
@@ -109,7 +109,7 @@ jobs:
       - name: Process playwright results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@v2
+        uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:

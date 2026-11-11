@@ -31,7 +31,7 @@ jobs:
 
       - name: Process test results
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@v2
+        uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
