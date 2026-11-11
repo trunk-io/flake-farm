@@ -19,6 +19,7 @@ steps:
       ./trunk-analytics-cli upload \
         --junit-paths "**/junitresults-*.xml" \
         --org-url-slug "trunk" \
+        --test-collection-id "h1vzkY4c" \
         --token "${TRUNK_API_TOKEN}"
     waitFor:
       - jest-test
