@@ -34,10 +34,11 @@ jobs:
         if: ${{ inputs.rspec_trunk_flaky_tests_version }}
         run: bundle install
 
-      - name: Optionally pin pre-release trunk rspec gem
-        if: vars.RSPEC_PRE_RELEASE_TEST_VERSION != '' && vars.RSPEC_PRE_RELEASE_TEST_VERSION != 'latest'
+      # The Gemfile's own pin is a 0.x gem, which can't use a v2 API key.
+      - name: Pin the trunk rspec gem (a pre-release when one is set, else 1.0.0)
+        if: vars.RSPEC_PRE_RELEASE_TEST_VERSION != 'latest'
         run: |
-          VERSION='${{ vars.RSPEC_PRE_RELEASE_TEST_VERSION }}'
+          VERSION='${{ vars.RSPEC_PRE_RELEASE_TEST_VERSION || '1.0.0' }}'
           sed -i "s/^gem 'rspec_trunk_flaky_tests'.*/gem 'rspec_trunk_flaky_tests', '= ${VERSION}'/" Gemfile
           bundle config set --local frozen false
           bundle install
