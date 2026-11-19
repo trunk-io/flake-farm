@@ -40,7 +40,7 @@ jobs:
       - name: Process pytest results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@main
+        uses: trunk-io/analytics-uploader@v2
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
@@ -68,7 +68,7 @@ jobs:
       - name: Process robotframework results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@main
+        uses: trunk-io/analytics-uploader@v2
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
