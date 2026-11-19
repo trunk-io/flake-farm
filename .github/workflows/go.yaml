@@ -40,7 +40,7 @@ jobs:
       - name: Process test results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@v2
+        uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
@@ -50,7 +50,7 @@ jobs:
           # Provide your Trunk organization slug.
           org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
-          token: ${{ secrets.TRUNK_TOKEN }}
+          token: ${{ secrets.TRUNK_PROD_V2_TEST_UPLOAD_TOKEN }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.run_tests.outcome }}
           test-collection-id: ${{ vars.TEST_COLLECTION_ID }}

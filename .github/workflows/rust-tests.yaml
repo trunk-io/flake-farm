@@ -33,7 +33,7 @@ jobs:
       - name: Run rust tests and upload results
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
-          TRUNK_API_TOKEN: ${{ secrets.TRUNK_TOKEN }}
+          TRUNK_API_TOKEN: ${{ secrets.TRUNK_PROD_V2_TEST_UPLOAD_TOKEN }}
         run: |
           ./trunk-analytics-cli test \
             --org-url-slug ${{ vars.ORG_SLUG }} \

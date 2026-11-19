@@ -59,7 +59,7 @@ jobs:
 
       - name: Process test results
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@v2
+        uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
@@ -67,6 +67,6 @@ jobs:
           bazel-bep-path: ${{ matrix.bep_format == 'binary' && 'bep.bin' || 'build_events.json' }}
           use-bazel-target-for-codeowners: true
           org-slug: ${{ vars.ORG_SLUG }}
-          token: ${{ secrets.TRUNK_TOKEN }}
+          token: ${{ secrets.TRUNK_PROD_V2_TEST_UPLOAD_TOKEN }}
           previous-step-outcome: ${{ matrix.bep_format == 'binary' && steps.run_tests_binary.outcome || steps.run_tests_json.outcome }}
           test-collection-id: ${{ vars.TEST_COLLECTION_ID }}
