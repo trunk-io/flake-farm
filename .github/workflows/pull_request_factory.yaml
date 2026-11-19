@@ -10,10 +10,10 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - name: Checkout code
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: trunk install
-        uses: trunk-io/trunk-action/install@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1
+        uses: trunk-io/trunk-action/install@e1234e67a86010d61ddac8d8ebf4b783e2ffd2fa # v2.0.0
         with:
           tools: gh
 
@@ -28,7 +28,7 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - name: Checkout code
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
 
@@ -54,7 +54,7 @@ jobs:
           echo "day=$(date +'%d')" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8.1.3
         with:
           token: ${{ secrets[steps.choose-next.outputs.secret_name] }}
           commit-message: Everyone knows its ${{ steps.switch.outputs.season }}
