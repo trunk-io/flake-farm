@@ -13,10 +13,11 @@ on:
 
 jobs:
   ruby_test:
-    runs-on: ubuntu-latest
+    # ruby/setup-ruby has no Ruby 3.4.7 build for ubuntu-latest's 26.04.
+    runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3      - uses: actions/checkout@v4      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Override rspec_trunk_flaky_tests version
         if: ${{ inputs.rspec_trunk_flaky_tests_version }}
@@ -25,7 +26,7 @@ jobs:
           cat Gemfile
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0 # v1.342.0
         with:
           ruby-version: 3.4.7
           bundler-cache: ${{ !inputs.rspec_trunk_flaky_tests_version }}
@@ -34,10 +35,11 @@ jobs:
         if: ${{ inputs.rspec_trunk_flaky_tests_version }}
         run: bundle install
 
-      - name: Optionally pin pre-release trunk rspec gem
-        if: vars.RSPEC_PRE_RELEASE_TEST_VERSION != '' && vars.RSPEC_PRE_RELEASE_TEST_VERSION != 'latest'
+      # The Gemfile's own pin is a 0.x gem, which can't use a v2 API key.
+      - name: Pin the trunk rspec gem (a pre-release when one is set, else 1.0.0)
+        if: vars.RSPEC_PRE_RELEASE_TEST_VERSION != 'latest'
         run: |
-          VERSION='${{ vars.RSPEC_PRE_RELEASE_TEST_VERSION }}'
+          VERSION='${{ vars.RSPEC_PRE_RELEASE_TEST_VERSION || '1.0.0' }}'
           sed -i "s/^gem 'rspec_trunk_flaky_tests'.*/gem 'rspec_trunk_flaky_tests', '= ${VERSION}'/" Gemfile
           bundle config set --local frozen false
           bundle install
@@ -51,7 +53,7 @@ jobs:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
           TRUNK_ORG_URL_SLUG: ${{ vars.ORG_SLUG }}
           TRUNK_TEST_COLLECTION_ID: ${{ vars.TEST_COLLECTION_ID }}
-          TRUNK_API_TOKEN: ${{ secrets.TRUNK_TOKEN }}
+          TRUNK_API_TOKEN: ${{ secrets.TRUNK_PROD_V2_TEST_UPLOAD_TOKEN }}
         run: bundle exec rspec
         continue-on-error: true
 
@@ -64,7 +66,7 @@ jobs:
       - name: Process rspec results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@v2
+        uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
@@ -74,7 +76,7 @@ jobs:
           # Provide your Trunk organization slug.
           org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
-          token: ${{ secrets.TRUNK_TOKEN }}
+          token: ${{ secrets.TRUNK_PROD_V2_TEST_UPLOAD_TOKEN }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.rspec_tests.outcome }}
           test-collection-id: ${{ vars.TEST_COLLECTION_ID }}
@@ -88,7 +90,7 @@ jobs:
       - name: Process minitest results
         # Run this step even if the test step ahead fails
         if: ${{ always() }}
-        uses: trunk-io/analytics-uploader@v2
+        uses: trunk-io/analytics-uploader@main
         env:
           TRUNK_PUBLIC_API_ADDRESS: ${{ vars.TRUNK_API_ENDPOINT }}
         with:
@@ -98,14 +100,14 @@ jobs:
           # Provide your Trunk organization slug.
           org-slug: ${{ vars.ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
-          token: ${{ secrets.TRUNK_TOKEN }}
+          token: ${{ secrets.TRUNK_PROD_V2_TEST_UPLOAD_TOKEN }}
           # Pass the test outcome for quarantining support
           previous-step-outcome: ${{ steps.minitest_tests.outcome }}
           test-collection-id: ${{ vars.TEST_COLLECTION_ID }}
 
       - name: Upload JUnit XML artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1        uses: actions/upload-artifact@v4        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ruby-junit-results
           path: |
